@@ -1,0 +1,1 @@
+# JQuery project that I wrote in 2017-2018

@@ -1,0 +1,120 @@
+#modal{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(85, 85, 85, 0.85);
+    background-position: 0px 0px;
+    background-size:  100% 100%;
+    background-repeat: no-repeat;
+    z-index: 10;
+}
+
+#modal>div{
+    position: absolute;
+    top: 25%;
+    height: 310px;
+    background-color: white;
+    border: 2px solid orangered;
+    border-radius: 8px;
+}
+
+#songs-form .container-fluid, #songs-form .container{
+    height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto; 
+}
+
+#modal>div, .input-group, .btn-lg{
+    box-shadow: -1px -1px 5px rgb(250, 133, 90);
+}
+#modal img{
+    display: block;
+    margin: auto;
+}
+#modal h3{
+    text-align: center;
+}
+#modal button,#modal input[type="reset"]{
+    background-color: orangered;
+    color: white;
+    padding: 5px 15px !important;
+    display: block;
+    margin: auto;
+    border-radius: 5px;
+    font-weight: bold;  
+    border: rgb(158, 43, 0);
+}
+/*#modal .input-group-addon{
+    width: 120px !important;
+}*/
+#playlist-form .input-group-addon:not(#name-corect):not(#url-corect){
+    width: 120px !important;
+}
+#songs-form-form .input-group-addon{
+    width: 70px !important;
+}
+#playlist-form .row, #songs-form-form .row{
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+#modal .col-sm-7{
+    float: left;
+    padding-right: 3px;
+}
+#modal .col-sm-5{
+    float: right;
+    padding-left: 3px;
+}
+
+#modal button:disabled{
+    background-color: rgb(54, 16, 2);
+    cursor: default;
+    box-shadow: -1px -1px 5px rgb(82, 78, 77);
+}
+#name,#cover-url{
+    float: right;
+}
+#playlist-form .row{
+    margin-top: 10px;
+}
+#playlist-form .row:last-child{
+    margin-top: 100px;
+}
+/*#songs-form .row:last-child{
+    margin-top: 80px;
+}*/
+.borderer{
+    box-shadow: -1px -1px 5px rgb(250, 133, 90);
+    /*box-shadow: -1px -1px 0px rgb(253, 221, 209);*/
+    border: 1px solid orangered;
+    width: 152px;
+    height: 152px;
+    margin: auto;
+    background-color: rgb(255, 218, 206);
+}
+.borderer, .borderer img{
+    border-radius: 5px;
+}
+#url-corect, #name-corect{
+    background-color: transparent;
+    color: red;
+    border: none;
+    padding: 6px 2px;
+    display: none;
+}
+#songs-form .row{
+    margin-top: 5px;
+    margin-bottom: 5px; 
+}
+#yes, #no {
+    display: block;
+    margin: auto;
+}
+#modal h4{
+    text-align: center;
+}
+.btn-container{
+    margin-top: 171px;
+}
