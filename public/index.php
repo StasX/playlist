@@ -1,4 +1,5 @@
 <?php
 
-$app = require __DIR__ . '/../app/routes.php';
+$app = require __DIR__ . '/../bootstrap/config.php';
+
 $app->run();
