@@ -8,13 +8,13 @@ const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 module.exports = {
     mode: "production",
 
-    entry: "./src/index.js",
+    entry: "./resources/js/main.js",
 
     output: {
-        path: path.resolve(__dirname, "public/assets"),
+        path: path.resolve(__dirname, "public"),
         filename: "js/bundle.[contenthash].js",
-        clean: true,
-        assetModuleFilename: "assets/[name].[contenthash][ext]"
+        clean: false,
+        assetModuleFilename: "[name].[contenthash][ext]"
     },
 
     module: {
@@ -61,7 +61,9 @@ module.exports = {
     optimization: {
         minimizer: [
             "...",
-            new CssMinimizerPlugin()
+            new CssMinimizerPlugin({
+                    filename: "css/bundle.[contenthash].css"
+                })
         ],
         splitChunks: {
             chunks: "all"

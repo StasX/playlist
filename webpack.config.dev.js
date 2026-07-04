@@ -1,15 +1,17 @@
 const path = require("path");
 const webpack = require("webpack");
+const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     mode: "development",
 
-    entry: "./src/index.js",
+    entry: "./resources/js/main.js",
 
     output: {
-        path: path.resolve(__dirname, "public/assets"),
-        filename: "bundle.js",
-        clean: true,
+        path: path.resolve(__dirname, "public"),
+        filename: "js/main.js",
+        clean: false,
         assetModuleFilename: "assets/[name][ext]"
     },
 
@@ -18,7 +20,7 @@ module.exports = {
             {
                 test: /\.scss$/i,
                 use: [
-                    "style-loader",
+                    MiniCssExtractPlugin.loader,
                     "css-loader",
                     "sass-loader"
                 ]
@@ -34,9 +36,15 @@ module.exports = {
     },
 
     plugins: [
+        new MiniCssExtractPlugin({
+            filename: "css/main.css"
+        }),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery"
+        }),
+        new WebpackManifestPlugin({
+            fileName: "manifest.json"
         })
     ],
 

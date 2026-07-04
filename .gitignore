@@ -1,2 +1,8 @@
 node_modules/
 vendor/
+public/fonts/
+public/assets/
+public/js/
+public/css/
+public/manifest.json
+

@@ -1,3 +1,5 @@
+require("lettering.js");
+require("../scss/main.scss");
 "use strict";
 //global variable for contain playlists
 let allPlaylists;
