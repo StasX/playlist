@@ -1,6 +1,6 @@
 "use strict";
 //global variable for contain playlists
-var allPlaylists;
+let allPlaylists;
 $(document).ready(function(){
    var visiblePlaylists;
     $.when( $.get(getPath("api/playlist")).then( function(data) {
@@ -10,7 +10,7 @@ $(document).ready(function(){
             $("#search-form").trigger("submit");
         }
     }));
-    var search = function(){
+    let search = function(){
         $('#main-container').html("");
         visiblePlaylists = [];
         for(var i = 0; i < len(allPlaylists); i++){

@@ -1,0 +1,41 @@
+{
+  "name": "playlist",
+  "version": "1.0.0",
+  "description": "Playlist Manager",
+  "homepage": "https://github.com/StasX/playlist#readme",
+  "bugs": {
+    "url": "https://github.com/StasX/playlist/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StasX/playlist.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "main": "webpack.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.0",
+    "bootstrap": "^5.3.8",
+    "glyphicons-only-bootstrap": "^1.0.1",
+    "jquery": "^4.0.0",
+    "lettering.js": "^0.8.2"
+  },
+  "devDependencies": {
+    "css-loader": "^7.1.4",
+    "css-minimizer-webpack-plugin": "^8.0.0",
+    "mini-css-extract-plugin": "^2.10.2",
+    "sass": "^1.101.0",
+    "sass-loader": "^17.0.0",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.108.3",
+    "webpack-cli": "^7.1.0",
+    "webpack-manifest-plugin": "^6.0.1"
+  }
+}
