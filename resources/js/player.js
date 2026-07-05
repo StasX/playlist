@@ -5,7 +5,7 @@ function createPlayer(playlists, pos){
     var id = playlists[pos].id;
     var songslist;
         function getSongs(){
-            $.when($.get(getPath("api/playlist/" + id + "/songs"))).then(function(data){ 
+            $.when($.get(getPath("playlist/" + id + "/songs"))).then(function(data){ 
                 if(data.success){
                     songslist = data.data.songs;
                     for(var i = 0; i < len(songslist); i++){

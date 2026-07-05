@@ -1,21 +1,24 @@
 "use strict";
-function validateName(name) { 
+const validateName = function (name) { 
     return ((name.length <= 60) && (name.length >0) && /^([\w\s_:?%'"&@,.-]|\(|\)|\[|\])+$/.test(name)); 
 }
+exports.validateName = validateName;
 
-function validateImgUrl(url) {
+const validateImgUrl = function (url) {
     if(url){
         return ((url.length <= 1000)  && (url.length > 0) && /^(http(s?)\:\/\/)(([0-9a-z])*([.-]?([0-9a-z])*)*(\.)([a-z]){2}([a-z])*(\/))([/.%:@&\w_,'"-]|\(|\)|\[|\])*(\.(jpg|gif|png))$/.test(url)); 
     }   else{
         return false;
     }
 }
+exports.validateImgUrl = validateImgUrl;
 
-function validateSongUrl(url) {
+const validateSongUrl = function (url) {
     return ((url.length <= 1000)  && (url.length > 0) && /^(http(s?)\:\/\/)(([0-9a-z])*([.-]?([0-9a-z])*)*(\.)([a-z]){2}([a-z])*)([/.%:@&\w_,'"-]|\(|\)|\[|\])*([%@&\w_,'"-]|\(|\)|\[|\])(\.mp3)$/.test(url)); 
 }
+exports.validateSongUrl = validateSongUrl;
 
-function validateSongs() {
+const validateSongs = function() {
     var songs = $('#modal .songs');
     var names = $('#modal .names');
     var results = []; 
@@ -41,7 +44,9 @@ function validateSongs() {
     }
     return ! results.includes(false); 
 }
-function validateSongsAndSand(playlist) {
+exports.validateSongs = validateSongs;
+
+const validateSongsAndSave = function(playlist) {
     function getPlaylistById(id){ 
         var url = getPath("api/playlist/" + id); 
         $.get(url, function(data) {
@@ -75,7 +80,9 @@ function validateSongsAndSand(playlist) {
         });
     }
 }
-function validateAndDisplayCover(){
+exports.validateSongsAndSave = validateSongsAndSave;
+
+const validateAndDisplayCover = function(){
     if(validateImgUrl($('#cover-url').val())){
         if($('#cover-url')){
             $('#cover-url').removeAttr("style");
@@ -92,3 +99,4 @@ function validateAndDisplayCover(){
         return false;
     }
 }
+exports.validateAndDisplayCover = validateAndDisplayCover;

@@ -1,11 +1,16 @@
+const $ = require("jquery");
 require("lettering.js");
 require("../scss/main.scss");
+const { getPath, len, findParentPos } = require("./utils.js");
+const { validateName, validateImgUrl, validateSongUrl, validateSongs, validateSongsAndSave, validateAndDisplayCover } = require("./validators.js");
+const { createModal, modal } = require("./modals.js");
+const { createPlayer } = require("./player.js");
 "use strict";
 //global variable for contain playlists
 let allPlaylists;
 $(document).ready(function(){
    var visiblePlaylists;
-    $.when( $.get(getPath("api/playlist")).then( function(data) {
+    $.when( $.get(getPath("playlist")).then( function(data) {
         var data = ( data || {} );
         if(data.success === true && len(data.data) > 0){
             allPlaylists = data.data;

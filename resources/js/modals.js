@@ -1,5 +1,6 @@
 "use strict";
-function createModal(title){ 
+const $ = require("jquery");
+const createModal = function(title){ 
 $('body').append('<div id="modal">'); 
     $('#modal').append('<div class="col-sm-4 col-sm-offset-4"></div>'); 
     $('#modal>div').append('<h3></h3>'); 
@@ -13,7 +14,8 @@ $('body').append('<div id="modal">');
         event.preventDefault(); 
     }); 
 }
- function modal(type, title, playlists, pos) {
+exports.createModal = createModal;
+const modal = function(type, title, playlists, pos) {
     //create modal
     createModal(title);
     /*$('body').append('<div id="modal">'); 
@@ -49,7 +51,7 @@ $('body').append('<div id="modal">');
         if (validateAndDisplayCover() && validateName($('#name').val())) {
             $('#update').removeAttr('disabled'); 
             $('#update').click(type, function () {
-                $.when($.post(getPath("api/playlist/" + playlists[pos].id),  {name:$("#name").val(), image:$("#cover-url").val()})).then(function (data) { 
+                $.when($.post(getPath("playlist/" + playlists[pos].id),  {name:$("#name").val(), image:$("#cover-url").val()})).then(function (data) { 
                         //find playlist and update all playlist list
                             var i = 0;
                             for(var i=0; i < allPlaylists.length; i++)  {
@@ -147,7 +149,7 @@ $('body').append('<div id="modal">');
                 var playlist = playlists[pos];
                 var curentPlaylist = {playlist:playlist,pos:pos};
                 $("#yes").click(curentPlaylist, function() {
-                    var url = getPath("api/playlist/" + curentPlaylist.id); 
+                    var url = getPath("playlist/" + curentPlaylist.id); 
                     $.ajax({url:url, type:'DELETE'}).done(function(data){
                         if(data.success===true){
                             $("#modal").remove();
@@ -177,3 +179,4 @@ $('body').append('<div id="modal">');
     }    
     }
 }
+exports.modal = modal;
