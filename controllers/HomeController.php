@@ -13,7 +13,7 @@ class HomeController
 
     public function index(Request $request, Response $response): Response
     {
-        return $this->twig->render($response, 'home.twig', [
+        return $this->twig->render($response, 'pages/home.twig', [
             'title' => 'Play List App',
         ]);
     }
