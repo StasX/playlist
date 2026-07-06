@@ -26,10 +26,16 @@ class PlaylistController
 
     public function createPlaylist(Request $request, Response $response): Response
     {
-        $data = json_decode($request->getBody(), true);
-        if (! isset($data['name']) || ! isset($data['image']) || ! isset($data['songs'])) {
+        $data = json_decode((string) $request->getBody(), true);
+        if (
+            ! is_array($data) ||
+            ! isset($data['name']) ||
+            ! isset($data['image']) ||
+            ! isset($data['songs'])
+        ) {
             return $response->withStatus(400);
         }
+
         $playlist        = new PlaylistModel();
         $playlist->name  = $data['name'];
         $playlist->image = $data['image'];
