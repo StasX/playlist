@@ -20,6 +20,10 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.html$/i,
+                type: "asset/source",
+            },
+            {
                 test: /\.scss$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
@@ -62,8 +66,8 @@ module.exports = {
         minimizer: [
             "...",
             new CssMinimizerPlugin({
-                    filename: "css/bundle.[contenthash].css"
-                })
+                filename: "css/bundle.[contenthash].css"
+            })
         ],
         splitChunks: {
             chunks: "all"

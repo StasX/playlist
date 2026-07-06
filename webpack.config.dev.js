@@ -18,6 +18,10 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.html$/i,
+                type: "asset/source",
+            },
+            {
                 test: /\.scss$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
