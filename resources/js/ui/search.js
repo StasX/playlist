@@ -1,7 +1,7 @@
 const $ = require("jquery");
 
 
-function search(name) {
+function search(name, playlists) {
     searchName = name.toLowerCase();
     const filteredPlaylists = allPlaylists.filter(playlist => playlist.name.toLowerCase().includes(searchName));
     displayPlaylists(filteredPlaylists);

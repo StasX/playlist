@@ -2,10 +2,10 @@ const $ = require("jquery");
 const {addPlaylist} = require("../features/playlist/add");
 
 
-function setAddPlaylistHandler() {
+function setAddPlaylistHandler(playlists) {
     $(" nav a").click(function (event) {
         event.preventDefault();
-        addPlaylist();
+        addPlaylist(playlists);
     });
 }
 

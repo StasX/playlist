@@ -1,8 +1,9 @@
 const Swal = require('sweetalert2');
 const $ = require("jquery");
+const { playlistApi } = require("../api/playlistApi")
 
 
-function displayPlaylist(playlist) {
+function displayPlaylist(playlist, playlists) {
     const deg = playlist.name.length * Math.PI + 1;
     $('#main-container').append(`
     <div class="col-ls-3 col-md-4  col-sm-6 col-xs-12">
@@ -53,12 +54,17 @@ function displayPlaylist(playlist) {
             cancelButtonColor: "#6d6968",
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
-            if (result.isConfirmed) Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
-                icon: "success",
-                confirmButtonColor: "#ff4500",
+            const id = playlist.id;
+            if (result.isConfirmed) (playlistApi.remove(id)).done(() => {
+                playlists.splice(index,1);
+                $("#main-container>div").eq(index).remove();
+                Swal.fire({
+                    text: "Playlist has been successfully deleted.",
+                    icon: "success",
+                    confirmButtonColor: "#ff4500",
+                });
             });
+
         });
 
     });
@@ -75,7 +81,7 @@ function displayPlaylist(playlist) {
 function displayPlaylists(playlists) {
     $('#main-container').html("");
     $.each(playlists, (i, playlist) => {
-        displayPlaylist(playlist);
+        displayPlaylist(playlist, playlists);
     });
 }
 

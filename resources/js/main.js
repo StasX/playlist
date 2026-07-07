@@ -9,5 +9,5 @@ let allPlaylists;
 $(function () {
     allPlaylists = load();
     setSearchHandler();
-    setAddPlaylistHandler();
+    setAddPlaylistHandler(playlists);
 });
