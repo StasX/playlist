@@ -42,6 +42,7 @@ nav a {
 
 #main-container {
   position: relative;
+  display: flex;
   left: 0px;
   top: 58px;
   right: 0px;
@@ -153,6 +154,11 @@ figcaption {
   height: 200px;
   display: block;
   margin: auto;
+  &:hover{
+    .play,.remove,.edit{
+        display: block;
+    }
+  }
 }
 
 .caption span {
@@ -166,35 +172,23 @@ figcaption {
 }
 
 .play {
-  bottom: 140px;
   width: 40px;
   height: 40px;
 }
 
 .remove,
 .edit {
-  bottom: 176px;
-  height: 27px;
-  width: 27px;
+  height: 40px;
+  width: 40px;
 }
 
 .remove i,
 .edit i {
   margin-left: -3px;
 }
-
-.remove {
-  left: 40px;
-}
-
-.edit {
-  left: 100px;
-}
-
 .remove,
 .edit,
 .play {
-  position: relative;
   margin: auto;
   border-radius: 50%;
   text-align: center;
@@ -701,3 +695,7 @@ figure img {
   float: left !important;
   
 }*/
+.btn-row{
+    position: relative;
+    bottom:30px;
+}
