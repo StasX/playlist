@@ -1,6 +1,7 @@
 const Swal = require('sweetalert2');
 const $ = require("jquery");
-const { playlistApi } = require("../api/playlistApi")
+const { playlistApi } = require("../api/playlistApi");
+const { success } = require("../utils/messages/success");
 
 
 function displayPlaylist(playlist, playlists) {
@@ -56,13 +57,9 @@ function displayPlaylist(playlist, playlists) {
         }).then((result) => {
             const id = playlist.id;
             if (result.isConfirmed) (playlistApi.remove(id)).done(() => {
-                playlists.splice(index,1);
+                playlists.splice(index, 1);
                 $("#main-container>div").eq(index).remove();
-                Swal.fire({
-                    text: "Playlist has been successfully deleted.",
-                    icon: "success",
-                    confirmButtonColor: "#ff4500",
-                });
+                success("Playlist has been successfully deleted.");
             });
 
         });

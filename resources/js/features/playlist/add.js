@@ -5,6 +5,8 @@ const { addSongs } = require("../songs/add");
 const { playlistApi } = require("../../api/playlistApi");
 const { displayPlaylist } = require("../../ui/display");
 const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
+const { success} = require("../../utils/messages/success");
+const {fail} = require("../../utils/messages/fail");
 
 function addPlaylist(playlists) {
     const playlist = {};
@@ -34,17 +36,8 @@ function addPlaylist(playlists) {
                     playlist.songs = songsData.songs;
                     (playlistApi.add(playlist)).done(() => {
                         displayPlaylist(playlist, playlists);
-                        Swal.fire({
-                            title: "Playlist saved successfully!",
-                            icon: "success",
-                            draggable: true
-                        });
-                    }).fail(() => Swal.fire({
-                        title: "Faild!",
-                        icon: "error",
-                        text: "Something went wrong...",
-                        draggable: true
-                    }));
+                        success("Playlist saved successfully!");
+                    }).fail(fail);
                 }
             });
         }
