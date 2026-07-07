@@ -1,7 +1,5 @@
-const Swal = require('sweetalert2');
 const $ = require("jquery");
-const { playlistApi } = require("../api/playlistApi");
-const { success } = require("../utils/messages/success");
+const {removePlaylist} =require("../features/playlist/remove");
 
 
 function displayPlaylist(playlist, playlists) {
@@ -44,34 +42,12 @@ function displayPlaylist(playlist, playlists) {
     </div>
     `);
     $('.card:last-child .caption').lettering();
-    $('.card:last-child .remove').on('click', () => {
-        const index = $(this).parent().parent().parent().parent().index();
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#ff4500",
-            cancelButtonColor: "#6d6968",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-            const id = playlist.id;
-            if (result.isConfirmed) (playlistApi.remove(id)).done(() => {
-                playlists.splice(index, 1);
-                $("#main-container>div").eq(index).remove();
-                success("Playlist has been successfully deleted.");
-            });
-
-        });
-
-    });
+    $('.card:last-child .remove').on('click', function(){ removePlaylist(playlists,$(this))});
     $('.card:last-child .edit').on('click', () => {
-        var playListPos = findParentPos(this, $("#main-container").children(), 3);
-        modal(3, "Edit Playlist", [playlist], playListPos);
+        
     });
     $('.card:last-child .play').on('click', () => {
-        var playListPos = findParentPos(this, $("#main-container").children(), 3);
-        createPlayer([playlist], playListPos);
+
     });
 }
 
