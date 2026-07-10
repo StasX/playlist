@@ -41,6 +41,9 @@ class PlaylistController
         $playlist->image = $data['image'];
         $playlist->songs = json_encode($data['songs']);
         $playlist->save();
+        $response->getBody()->write(json_encode([
+            'id' => $playlist->id,
+        ]));
         return $response->withStatus(201);
     }
 
