@@ -1,8 +1,9 @@
 const $ = require("jquery");
 const {removePlaylist} =require("../features/playlist/remove");
+const { AppStore } = require("../store/AppStore");
 
 
-function displayPlaylist(playlist, playlists) {
+function displayPlaylist(playlist) {
     const deg = playlist.name.length * Math.PI + 1;
     $('#main-container').append(`
     <div class="col-ls-3 col-md-4  col-sm-6 col-xs-12">
@@ -42,7 +43,7 @@ function displayPlaylist(playlist, playlists) {
     </div>
     `);
     $('.card:last-child .caption').lettering();
-    $('.card:last-child .remove').on('click', function(){ removePlaylist(playlists,$(this))});
+    $('.card:last-child .remove').on('click', function(){ removePlaylist($(this))});
     $('.card:last-child .edit').on('click', () => {
         
     });
@@ -51,10 +52,11 @@ function displayPlaylist(playlist, playlists) {
     });
 }
 
-function displayPlaylists(playlists) {
+function displayPlaylists() {
+        const store=AppStore.getInstance();
     $('#main-container').html("");
-    $.each(playlists, (i, playlist) => {
-        displayPlaylist(playlist, playlists);
+    $.each(store.getPlaylists(), (i, playlist) => {
+        displayPlaylist(playlist);
     });
 }
 

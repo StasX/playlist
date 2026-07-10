@@ -1,17 +1,18 @@
 const $ = require("jquery");
 const { displayPlaylists } = require("./display");
-const {playlistApi} = require("../api/playlistApi")
+const { playlistApi } = require("../api/playlistApi");
+const { AppStore } = require("../store/AppStore");
 
 
 function load() {
     let allPlaylists;
     $.when(playlistApi.load.then(function (data, textStatus, jqXHR) {
         if (jqXHR.status === 200) {
-            allPlaylists = data;
-            displayPlaylists(allPlaylists);
+            const store = AppStore.getInstance();
+            store.setPlaylists(data);
+            displayPlaylists();
         }
     }));
-    return allPlaylists;
 }
 
 exports.load = load;

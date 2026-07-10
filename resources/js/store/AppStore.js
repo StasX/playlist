@@ -32,6 +32,16 @@ class AppStore {
         return true;
     }
 
+    addPlaylist(data) {
+        if (typeof data !== "object" || data === null || isNaN(data.id) || !data.name || !data.image || !Array.isArray(data?.songs)) {
+            return false;
+        }
+        const index = this._state.playlists.findIndex((element) => element.id == data.id);
+        if (!index == -1) return false;
+        this._state.playlists.push({ ...data.name });
+        return true;
+    }
+
     updatePlaylist(data) {
         if (typeof data !== "object" || data === null || isNaN(data.id)) {
             return false;
@@ -42,7 +52,13 @@ class AppStore {
         this._state.playlists[index].image = data.image;
         return true;
     }
-
+    removePlaylist(id) {
+        if (isNaN(id) || id < 0) return false;
+        const index = this._state.playlists.findIndex((element) => element.id === id);
+        if (index == -1) return false;
+        this._state.playlists.splice(index, 1);
+        return true;
+    }
     getSongs(id) {
         const playlist = this.getPlaylist(id);
         return (!playlist || !Array.isArray(playlist.songs)) ? [] : [...playlist.songs];

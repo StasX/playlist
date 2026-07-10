@@ -3,10 +3,13 @@ const Swal = require('sweetalert2');
 const { success } = require("../../utils/messages/success");
 const { fail } = require("../../utils/messages/fail");
 const { playlistApi } = require("../../api/playlistApi");
+const {AppStore} = require("../../store/AppStore");
 
 
-function removePlaylist(playlists, element) {
+function removePlaylist(element) {
     const index = element.parent().parent().parent().parent().index();
+    const store =  AppStore.getInstance();
+    const playlists = store.getPlaylists(); 
     Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -18,7 +21,7 @@ function removePlaylist(playlists, element) {
     }).then((result) => {
         const id = playlists[index].id;
         if (result.isConfirmed) (playlistApi.remove(id)).done(() => {
-            playlists.splice(index, 1);
+            store.removePlaylist(id);
             $("#main-container>div").eq(index).remove();
             success("Playlist has been successfully deleted.");
         }).fail(fail);

@@ -7,6 +7,7 @@ const { displayPlaylist } = require("../../ui/display");
 const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
 const { success} = require("../../utils/messages/success");
 const {fail} = require("../../utils/messages/fail");
+const {AppStore} = require("../../store/AppStore");
 
 function addPlaylist(playlists) {
     const playlist = {};
@@ -34,8 +35,12 @@ function addPlaylist(playlists) {
             cb.then((result) => {
                 if (result.isConfirmed) {
                     playlist.songs = songsData.songs;
-                    (playlistApi.add(playlist)).done(() => {
-                        displayPlaylist(playlist, playlists);
+                    (playlistApi.add(playlist)).done((data) => {
+                        console.log(data.id); // <<<<<<<<<<<<<
+                        playlist.id=data.id;
+                        const store = AppStore.getInstance();
+                        store.addPlaylist(playlist)
+                        displayPlaylist();
                         success("Playlist saved successfully!");
                     }).fail(fail);
                 }

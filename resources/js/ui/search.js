@@ -1,20 +1,15 @@
 const $ = require("jquery");
-
-
-function search(name, playlists) {
-    searchName = name.toLowerCase();
-    const filteredPlaylists = allPlaylists.filter(playlist => playlist.name.toLowerCase().includes(searchName));
-    displayPlaylists(filteredPlaylists);
-}
+const { AppStore } = require("../store/AppStore");
+const { displayPlaylists } = require("./display");
 
 function setSearchHandler() {
+    const store = AppStore.getInstance();
     $("#search-form").on("submit", function (event) {
         event.preventDefault();
-        search($("#search-form input").val());
+        store.setSearchTerm($("#find-input").val());
+        displayPlaylists();
+
     });
-    $("#search-form input").on("input", () => search($(this).val()));
-    $(".glyphicon-search").on("click", () => search($("#search-form input").val()));
 }
 
-exports.search = search;
 exports.setSearchHandler = setSearchHandler;
