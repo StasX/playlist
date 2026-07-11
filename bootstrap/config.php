@@ -12,7 +12,7 @@ $container = new Container();
 AppFactory::setContainer($container);
 
 $container->set('view', function () {
-    return Twig::create(__DIR__ . '/../resources/templates', [
+    return Twig::create(__DIR__ . '/../app/Views', [
         'cache' => false,
     ]);
 });
@@ -26,10 +26,10 @@ $app = AppFactory::create();
 $app->add(TwigMiddleware::createFromContainer($app));
 $app->addRoutingMiddleware();
 
-require __DIR__ . '/../app/logger.php';
+require __DIR__ . '/logger.php';
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
 
-require __DIR__ . '/../app/routes.php';
+require __DIR__ . '/../config/routes.php';
 
 return $app;
