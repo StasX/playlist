@@ -1,5 +1,6 @@
 const $ = require("jquery");
-const {removePlaylist} =require("../features/playlist/remove");
+const { removePlaylist } = require("../features/playlist/remove");
+const { updatePlaylist } = require("../features/playlist/update");
 const { AppStore } = require("../store/AppStore");
 
 
@@ -43,17 +44,15 @@ function displayPlaylist(playlist) {
     </div>
     `);
     $('.card:last-child .caption').lettering();
-    $('.card:last-child .remove').on('click', function(){ removePlaylist($(this))});
-    $('.card:last-child .edit').on('click', () => {
-        
-    });
+    $('.card:last-child .remove').on('click', function () { removePlaylist($(this)) });
+    $('.card:last-child .edit').on('click', function () { updatePlaylist($(this)) });
     $('.card:last-child .play').on('click', () => {
 
     });
 }
 
 function displayPlaylists() {
-        const store=AppStore.getInstance();
+    const store = AppStore.getInstance();
     $('#main-container').html("");
     $.each(store.getPlaylists(), (i, playlist) => {
         displayPlaylist(playlist);
