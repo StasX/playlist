@@ -36,11 +36,10 @@ function addPlaylist(playlists) {
                 if (result.isConfirmed) {
                     playlist.songs = songsData.songs;
                     (playlistApi.add(playlist)).done((data) => {
-                        console.log(data.id); // <<<<<<<<<<<<<
                         playlist.id=data.id;
                         const store = AppStore.getInstance();
                         store.addPlaylist(playlist)
-                        displayPlaylist();
+                        displayPlaylist(playlist);
                         success("Playlist saved successfully!");
                     }).fail(fail);
                 }

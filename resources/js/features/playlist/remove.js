@@ -3,13 +3,13 @@ const Swal = require('sweetalert2');
 const { success } = require("../../utils/messages/success");
 const { fail } = require("../../utils/messages/fail");
 const { playlistApi } = require("../../api/playlistApi");
-const {AppStore} = require("../../store/AppStore");
-
+const { AppStore } = require("../../store/AppStore");
+const {getParent} = require("../../utils/other/getParent");
 
 function removePlaylist(element) {
-    const index = element.parent().parent().parent().parent().index();
-    const store =  AppStore.getInstance();
-    const playlists = store.getPlaylists(); 
+    const index = getParent(element,9).index();
+    const store = AppStore.getInstance();
+    const playlists = store.getPlaylists();
     Swal.fire({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
