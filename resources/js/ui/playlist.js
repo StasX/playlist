@@ -3,10 +3,7 @@ const {addPlaylist} = require("../features/playlist/add");
 
 
 function setAddPlaylistHandler() {
-    $(" nav a").click(function (event) {
-        event.preventDefault();
-        addPlaylist();
-    });
+    $("#add-playlist").click(addPlaylist);
 }
 
 exports.setAddPlaylistHandler = setAddPlaylistHandler;

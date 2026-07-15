@@ -1,44 +1,17 @@
-@import "@fortawesome/fontawesome-free/css/all.min.css";
+@use "./partials/nav";
+@import "@fortawesome/fontawesome-free/css/all.css";
 @import "bootstrap/dist/css/bootstrap.min.css";
-@import "glyphicons-only-bootstrap/css/bootstrap.min.css";
+@import "glyphicons-only-bootstrap/css/bootstrap.css";
+
+
+
 html,
 body {
   height: 100%;
+  padding: 0%;
+  margin:0%;
 }
 
-nav {
-  background-color: white;
-}
-
-nav form {
-  display: inline-block;
-}
-
-nav a {
-  margin-left: 20px;
-}
-
-#search-form {
-  float: right;
-}
-
-#find {
-  border: 0px;
-  /*padding: 6px;*/
-  height: 20px;
-  margin-left: -20px;
-  z-index: 0;
-  opacity: 0;
-}
-
-.navbar {
-  z-index: 2;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  border-bottom: 1px solid orangered;
-}
 
 #main-container {
   position: relative;
@@ -48,49 +21,51 @@ nav a {
   right: 0px;
 }
 
-a {
-  color: orangered !important;
-  font-weight: bold;
-  text-decoration: none !important;
-}
 
-a>i {
-  color: white !important;
-  border-radius: 50%;
-  background-color: orangered !important;
-  padding: 3px 4px;
-  font-weight: 300;
-  margin-right: 8px;
-  text-align: center;
-}
 
-#search-container {
-  float: right !important;
-  margin-right: 20px;
-  margin-top: 7px;
-}
 
-#add-playlist {
-  margin-top: 14px;
-  margin-bottom: 10px;
-}
 
-#find {
-  z-index: 2;
-  width: 20px;
-}
 
-.input-group-addon {
-  background-color: orangered;
-  color: white;
-  font-weight: bold;
-}
+// a {
+//   color: orangered !important;
+//   font-weight: bold;
+//   text-decoration: none !important;
+// }
 
-.form-control,
-.input-group-addon {
-  border-color: orangered;
-  outline: transparent none 0px !important;
-}
+// a>i {
+//   color: white !important;
+//   border-radius: 50%;
+//   background-color: orangered !important;
+//   padding: 3px 4px;
+//   font-weight: 300;
+//   margin-right: 8px;
+//   text-align: center;
+// }
+
+// #search-container {
+//   float: right !important;
+//   margin-right: 20px;
+//   margin-top: 7px;
+// }
+
+// #add-playlist {
+//   margin-top: 14px;
+//   margin-bottom: 10px;
+// }
+
+// #find {
+//   z-index: 2;
+//   width: 20px;
+// }
+
+// .input-group-addon {
+//   background-color: orangered;
+//   color: white;
+//   font-weight: bold;
+// }
+
+
+
 
 input[type="search"]:active,
 input[type="search"]:hover,
@@ -108,7 +83,6 @@ button:focus {
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
   outline: 0 none !important;
-  -webkit-appearance: none;
   border-color: orange;
 }
 

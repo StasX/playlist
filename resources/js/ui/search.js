@@ -6,7 +6,7 @@ function setSearchHandler() {
     const store = AppStore.getInstance();
     $("#search-form").on("submit", function (event) {
         event.preventDefault();
-        store.setSearchTerm($("#find-input").val());
+        store.setSearchTerm($("#search-input").val());
         displayPlaylists();
 
     });

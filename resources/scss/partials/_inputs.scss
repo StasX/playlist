@@ -1,0 +1,15 @@
+@use "sass:color";
+@use "../base/variables";
+
+
+.form-control {
+    border-color: variables.$orange;
+    outline: transparent none 0px !important;
+    border-color: variables.$orange;
+    padding: 6px 12px;
+
+    &:active, &:focus {
+        border: 2px solid color.scale(variables.$orange, $lightness: 45%);
+        padding: 5px 11px;
+    }
+}
