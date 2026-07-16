@@ -3,7 +3,6 @@ const Swal = require('sweetalert2');
 const { fail } = require("../../utils/messages/fail");
 const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
-const { getParent } = require("../../utils/other/getParent");
 const html = require("../../../views/modals/playlist.html");
 const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
 

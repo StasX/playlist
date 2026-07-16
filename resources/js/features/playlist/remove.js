@@ -4,10 +4,10 @@ const { success } = require("../../utils/messages/success");
 const { fail } = require("../../utils/messages/fail");
 const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
-const {getParent} = require("../../utils/other/getParent");
 
 function removePlaylist(element) {
-    const index = getParent(element,9).index();
+    const cardContainer = element.closest(".card-container");
+    const index = cardContainer.index();
     const store = AppStore.getInstance();
     const playlists = store.getPlaylists();
     Swal.fire({
@@ -22,7 +22,7 @@ function removePlaylist(element) {
         const id = playlists[index].id;
         if (result.isConfirmed) (playlistApi.remove(id)).done(() => {
             store.removePlaylist(id);
-            $("#main-container>div").eq(index).remove();
+            cardContainer.remove();
             success("Playlist has been successfully deleted.");
         }).fail(fail);
 
