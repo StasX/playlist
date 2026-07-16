@@ -6,16 +6,16 @@ const { AppStore } = require("../../store/AppStore");
 const { getParent } = require("../../utils/other/getParent");
 const html = require("../../../views/modals/playlist.html");
 const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
-const { displayPlaylists } = require("../../ui/display");
+
+
 
 
 function updatePlaylist(element) {
-    const index = getParent(element, 9).index();
+    const cardContainer = element.closest(".card-container");
+    const index = cardContainer.index();
     const store = AppStore.getInstance();
     const playlists = store.getPlaylists();
     const playlist = playlists[index];
-
-
     Swal.fire({
         title: "Update playlist",
         html: html,
@@ -35,16 +35,26 @@ function updatePlaylist(element) {
             validatePlaylistForm(name, imgUrl, playlist, confirmBtn);
             name.val(playlist.name);
             imgUrl.val(playlist.image);
-            playlist.name = name.val();
-            playlist.image = imgUrl.val();
+            const imgContainer = popup.find(".image-container");
+            const img = imgContainer.find("img");
+            imgContainer.css("display", "block");
+            img.attr("src", playlist.image);
+        },
+        preConfirm: () => {
+            const popup = $(Swal.getPopup());
+            return {
+                ...playlist,
+                name: popup.find("#playlist-name").val().trim(),
+                image: popup.find("#playlist-image").val().trim()
+            };
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            playlistApi.update(playlist).done(() => {
-                store.updatePlaylist(playlist);
-                $(`#main-container>div:nth-child(${index+1})`).find(".caption").html(playlist.name);
-                $(`#main-container>div:nth-child(${index+1})`).find("img").attr("src",playlist.image);
-                $(`#main-container>div:nth-child(${index+1}) .caption`).lettering();
+            const updatedPlaylist = result.value;
+            playlistApi.update(updatedPlaylist).done(() => {
+                store.updatePlaylist(updatedPlaylist);
+                 const { displayPlaylist } = require("../../ui/display");
+                displayPlaylist(updatedPlaylist, cardContainer);
             }).fail(fail);
         }
     });

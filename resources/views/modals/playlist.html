@@ -1,23 +1,25 @@
-<div class="col-sm-8">
+<div class="container">
     <div class="row">
-        <div class="input-group col-sm-12">
-            <label for="name" class="input-group-addon">Playlist name: </label>
-            <input type="text" spellcheck="false" autocomplete="off" id="playlist-name" placeholder="Playlist name"
-                class="form-control" />
-            <!--<span class="input-group-addon glyphicon glyphicon-remove" id="name-corect"></span>-->
+        <div class="col-sm-8">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <input type="text" id="playlist-name" spellcheck="false" autocomplete="off"
+                            placeholder="Playlist name" class="form-control me-2" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" id="playlist-image" spellcheck="false" autocomplete="off" id="playlist-image"
+                            placeholder="Cover URL" class="form-control" style="margin-top:10px" />
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="input-group col-sm-12">
-            <label for="cover-url" class="input-group-addon">Cover URL: </label>
-            <input type="text" spellcheck="false" autocomplete="off" id="playlist-image" placeholder="Cover URL"
-                class="form-control" />
-            <!--<span class="input-group-addon glyphicon glyphicon-remove" id="url-corect"></span>-->
+        <div class="col-sm-4">
+            <div class="image-container">
+                <img src="" width="140" height="140" />
+            </div>
         </div>
-    </div>
-</div>
-<div class="col-sm-4">
-    <div class="borderer">
-        <img src="" width="150" height="150" style="display:none" />
     </div>
 </div>

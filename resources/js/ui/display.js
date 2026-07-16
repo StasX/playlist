@@ -4,16 +4,15 @@ const { updatePlaylist } = require("../features/playlist/update");
 const { AppStore } = require("../store/AppStore");
 
 function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
+    return str.replace(/[&<>'"]/g,
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
 }
 
-function displayPlaylist(playlist) {
+function displayPlaylist(playlist, element) {
     const escapedName = escapeHTML(playlist.name);
     const escapedImage = escapeHTML(playlist.image);
-    const card = $(`
-        <div class="col-lg-3 col-md-4 col-sm-6 col-12 card-container">
+    const card= $(`
             <div class="card quadratic-card">
                 <div class="card-body">
                     <figure class="disk">
@@ -41,11 +40,11 @@ function displayPlaylist(playlist) {
                     </figure>
                 </div>
             </div>
-        </div>
     `);
-
-    $('#main-container>div').append(card);
-    const arcText = card.find(".arc-text");
+    const cardContainer = element || $('<div class="col-lg-3 col-md-4 col-sm-6 col-12 card-container"></div>');
+    cardContainer.html(card);
+    if (!element) $('#main-container>div').append(cardContainer);
+    const arcText = cardContainer.find(".arc-text");
     arcText.lettering();
     const letters = arcText.find("span");
     const total = letters.length;
@@ -56,20 +55,19 @@ function displayPlaylist(playlist) {
             total === 1
                 ? 0
                 : startAngle +
-                  (endAngle - startAngle) * (index / (total - 1));
+                (endAngle - startAngle) * (index / (total - 1));
 
         $(this).css("transform", `rotate(${angle}deg)`);
     });
-
-    card.find('.remove').on('click', function () { removePlaylist($(this)); });
-    card.find('.edit').on('click', function () { updatePlaylist($(this)); });
-    card.find('.play').on('click', () => {        
+    cardContainer.find('.remove').on('click', function () { removePlaylist($(this)); });
+    cardContainer.find('.edit').on('click', function () { updatePlaylist($(this)); });
+    cardContainer.find('.play').on('click', () => {
     });
 }
 
 function displayPlaylists() {
     const store = AppStore.getInstance();
-    $('#main-container>div').empty(); 
+    $('#main-container>div').empty();
     $.each(store.getPlaylists(), (i, playlist) => {
         displayPlaylist(playlist);
     });

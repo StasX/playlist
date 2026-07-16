@@ -1,0 +1,12 @@
+@use "../base/variables";
+
+.image-container {
+    border-radius: 8px;
+    display: none;
+    width: 144px;
+    height: 144px;
+    border: 2px solid variables.$orange;
+    img {
+        border-radius: 8px;
+    }
+}
