@@ -78,9 +78,6 @@ audio::-webkit-media-controls-panel {
     width: calc(100% + 30px);
 }
 .rotation{
-    -webkit-animation: rotate 3s linear infinite;
-    -moz-animation: rotate 3s linear infinite;
-    -o-animation: rotate 3s linear infinite;
     animation: rotate 3s linear infinite;
 }
 #remove-songs, 
@@ -114,11 +111,12 @@ ol  span:hover{
 #remove-songs:hover, 
 #edit-songs:hover{
     color: white;
-    backgrond-color: orangered;
+    background-color: orangered;
 }
 h4{
     text-align: center;
 }
+
 #play-pause{
     width: 40px;
     height: 40px;
@@ -129,6 +127,7 @@ h4{
     background-color: rgba(255, 255, 255, 0.7);
   border: 1px solid #333333;
 }
+
 #play-pause:hover{
     background-color: orangered;
     opacity: 0.7;
@@ -136,40 +135,7 @@ h4{
     color:white;
 }
 
-@-webkit-keyframes rotate{
-    
-    from{
-        -webkit-transform: rotate(0deg);
-    }   
-    
-    to{
-        -webkit-transform: rotate(359deg);
-    } 
-}
-@-o-keyframes rotate{
-    
-    from{
-        -o-transform: rotate(0deg);
-    }   
-    
-    to{
-        -o-transform: rotate(359deg);
-    }
-}
-
-@-moz-keyframes rotate{
-    
-    from{
-        -moz-transform: rotate(0deg);
-    }   
-    
-    to{
-        -moz-transform: rotate(359deg);
-    }
-}
-
 @keyframes rotate{
-    
     from{
         transform: rotate(0deg);
     }

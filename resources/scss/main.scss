@@ -1,6 +1,7 @@
 @use "./partials/nav";
 @use "./partials/card";
 @use "./partials/dialogs";
+@use "./player.scss";
 @import "@fortawesome/fontawesome-free/css/all.css";
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "glyphicons-only-bootstrap/css/bootstrap.css";
@@ -25,8 +26,6 @@ button:active,
 button:hover,
 button:focus {
     box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
     outline: 0 none !important;
     border-color: transparent;
 }

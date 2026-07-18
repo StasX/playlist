@@ -9,7 +9,14 @@ class PlaylistController
 {
     public function getAllPlaylists(Request $request, Response $response): Response
     {
-        $playlists = PlaylistModel::all();
+        $playlists = PlaylistModel::all()->toArray();
+        $playlists = array_map(
+            fn($playlist) => [
+                 ...$playlist,
+                'songs' => json_decode($playlist['songs'], true),
+            ],
+            $playlists
+        );
         $response->getBody()->write(json_encode($playlists));
         return $response->withHeader('Content-Type', 'application/json');
     }

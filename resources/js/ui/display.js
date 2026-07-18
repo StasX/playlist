@@ -2,6 +2,7 @@ const $ = require("jquery");
 const { removePlaylist } = require("../features/playlist/remove");
 const { updatePlaylist } = require("../features/playlist/update");
 const { AppStore } = require("../store/AppStore");
+const {createPlayer} =require("../features/player");
 
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g,
@@ -61,8 +62,7 @@ function displayPlaylist(playlist, element) {
     });
     cardContainer.find('.remove').on('click', function () { removePlaylist($(this)); });
     cardContainer.find('.edit').on('click', function () { updatePlaylist($(this)); });
-    cardContainer.find('.play').on('click', () => {
-    });
+    cardContainer.find('.play').on('click', function () { createPlayer($(this)); });
 }
 
 function displayPlaylists() {
