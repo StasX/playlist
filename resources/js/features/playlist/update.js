@@ -50,9 +50,14 @@ function updatePlaylist(element) {
     }).then((result) => {
         if (result.isConfirmed) {
             const updatedPlaylist = result.value;
-            playlistApi.update(updatedPlaylist).done(() => {
+            const id = updatedPlaylist.id;
+            const data = {
+                name: updatePlaylist.name,
+                image: updatePlaylist.image
+            }
+            playlistApi.update(id, data).done(() => {
                 store.updatePlaylist(updatedPlaylist);
-                 const { displayPlaylist } = require("../../ui/display");
+                const { displayPlaylist } = require("../../ui/display");
                 displayPlaylist(updatedPlaylist, cardContainer);
             }).fail(fail);
         }
