@@ -9,20 +9,20 @@ class SongsController
 {
     public function getAllSongs(Request $request, Response $response, array $args): Response
     {
-        $playlist = PlaylistModel::find($args['id']);
+        $playlist = PlaylistModel::select('songs')->find($args['id']);
         if (! $playlist) {
             return $response->withStatus(404);
         }
-        $response->getBody()->write(json_encode(['songs' => $playlist->songs]));
+        $response->getBody()->write(json_encode(['songs' => json_decode($playlist->songs, true)]));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function updateSongs(Request $request, Response $response, array $args): Response
     {
         if (! isset($data['songs']) || ! is_array($data['songs']) ||
-        !array_key_exists('name', $data['songs']) ||
-        !array_key_exists('url', $data['songs'])
-    ) {
+            ! array_key_exists('name', $data['songs']) ||
+            ! array_key_exists('url', $data['songs'])
+        ) {
             return $response->withStatus(400);
         }
         $playlist = PlaylistModel::find($args['id']);

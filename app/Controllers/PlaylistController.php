@@ -9,21 +9,14 @@ class PlaylistController
 {
     public function getAllPlaylists(Request $request, Response $response): Response
     {
-        $playlists = PlaylistModel::all()->toArray();
-        $playlists = array_map(
-            fn($playlist) => [
-                 ...$playlist,
-                'songs' => json_decode($playlist['songs'], true),
-            ],
-            $playlists
-        );
+        $playlists = PlaylistModel::select('id', 'name', 'image')->get()->toArray();
         $response->getBody()->write(json_encode($playlists));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function getPlaylist(Request $request, Response $response, array $args): Response
     {
-        $playlist = PlaylistModel::find($args['id']);
+        $playlist = PlaylistModel::select('id', 'name', 'image')->find($args['id']);
         if (! $playlist) {
             return $response->withStatus(404);
         }
@@ -83,7 +76,7 @@ class PlaylistController
         $playlist = PlaylistModel::find($id);
         if ($playlist) {
             $playlist->delete();
-            $response->withStatus(200);
+            $response->withStatus(202);
             return $response;
         }
         $response->withStatus(400);
