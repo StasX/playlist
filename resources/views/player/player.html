@@ -1,15 +1,20 @@
-<div class="container">
+<div id="player-conainer" class="container">
     <div class="row">
-        <div class="col-sm-4 col-xs-4">
-            <img width="200" height="200" alt="album">
-            <button id="play-pause"><i class="fa fa-pause"></i></button>
-        </div>
+<div class="col-sm-4 col-xs-4">
+    <!-- Wrap img and button in a relative container -->
+    <div class="album-cover">
+        <img width="200" height="200" alt="album">
+        <button id="play-pause" class="btn btn-orange">
+            <i class="fa-solid fa-pause"></i>
+        </button>
+    </div>
+</div>
         <div class="col-sm-8 col-xs-8 container">
             <div class="row">
                 <audio controls></audio>
             </div>
             <div class="row">
-                <h4></h4>
+                <h5></h5>
             </div>
             <div class="row">
                 <ol></ol>
@@ -17,6 +22,3 @@
         </div>
     </div>
 </div>
-
-<button id="remove-songs"><i class="fa fa-times"></i></button>
-<button id="edit-songs"><b class="fa fa-pencil"></b></button>
