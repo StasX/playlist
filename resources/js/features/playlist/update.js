@@ -52,8 +52,8 @@ function updatePlaylist(element) {
             const updatedPlaylist = result.value;
             const id = updatedPlaylist.id;
             const data = {
-                name: updatePlaylist.name,
-                image: updatePlaylist.image
+                name: updatedPlaylist.name,
+                image: updatedPlaylist.image
             }
             playlistApi.update(id, data).done(() => {
                 store.updatePlaylist(updatedPlaylist);
