@@ -29,19 +29,22 @@ function createModal(playlist) {
 
             let currentSong = 0;
             const song = audio.get(currentSong);
-            const currentSongName = playlist.songs[currentSong].name
+            let currentSongName = playlist.songs[currentSong].name
             nowPlaying.text(`Now playing: ${currentSongName}`);
             $("title").text(`Playing: ${currentSongName}`);
             song.play();
             const playPauseButton = popup.find("#play-pause");
             audio.on("play", () => {
-                console.log("playing")
                 playPauseButton.html('<i class="fa-solid fa-pause"></i>');
                 image.addClass("rotation");
+                const songContainer=songsList.find(`li:nth-child(${currentSong+1})`);
+                songContainer.html(`<i class="fa-solid fa-play list-playing" style="top:${currentSong*24}"></i>${currentSongName}`);
             });
             audio.on("pause", () => {
                 console.log("paused")
                 playPauseButton.html('<i class="fa-solid fa-play"></i>');
+                const songContainer=songsList.find(`li:nth-child(${currentSong+1})`);
+                songContainer.html(`<i class="fa-solid fa-pause list-playing" style="top:${currentSong*24}"></i>${currentSongName}`);
                 image.removeClass("rotation");
             });
             playPauseButton.click(() => {
