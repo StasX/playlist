@@ -22,7 +22,15 @@ RUN composer install \
     --classmap-authoritative
 COPY --from=frontend-builder /app .
 
+
 FROM php:8.3-fpm-alpine3.24
+ENV DB_HOST=$DB_HOST
+ENV DB_PORT=$DB_PORT
+ENV DB_DATABASE=$DB_DATABASE
+ENV DB_USERNAME=$DB_USERNAME
+ENV DB_PASSWORD=$DB_PASSWORD
+ENV DB_CHARSET=$DB_CHARSET
+ENV DB_COLLATION=$DB_COLLATION
 RUN apk update && apk upgrade --no-cache && \
     docker-php-ext-install pdo_mysql
 WORKDIR /var/www/html

@@ -12,6 +12,14 @@ services:
       - database-data:/var/lib/mysql
   app:
     build: .
+    environment:
+      DB_HOST: database
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_CHARSET: ${DB_CHARSET}
+      DB_COLLATION: ${DB_COLLATION}
     volumes:
       - ./:/var/www/html
   nginx:

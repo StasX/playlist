@@ -5,13 +5,13 @@ $capsule = new Capsule();
 
 $capsule->addConnection([
     'driver'    => 'mysql',
-    'host'      => '127.0.0.1',
-    'port'      => 3306,
-    'database'  => 'playlist',
-    'username'  => 'root',
-    'password'  => '',
-    'charset'   => 'utf8mb4',
-    'collation' => 'utf8mb4_unicode_ci',
+    'host'      => getenv('DB_HOST') ?: 'localhost',
+    'port'      => ((int) getenv('DB_PORT') ?: 3306),
+    'database'  => getenv('DB_DATABASE') ?: 'playlist',
+    'username'  => getenv('DB_USERNAME') ?: 'root',
+    'password'  => getenv('DB_PASSWORD'),
+    'charset'   => getenv('DB_CHARSET'),
+    'collation' => getenv('DB_COLLATION'),
     'prefix'    => '',
 ]);
 // Makes Capsule available globally via static methods:
