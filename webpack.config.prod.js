@@ -3,9 +3,8 @@ const path = require("path");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 
-module.exports = {
+const config = {
     mode: "production",
 
     entry: "./resources/js/main.js",
@@ -56,21 +55,22 @@ module.exports = {
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery"
-        }),
-        new WebpackManifestPlugin({
-            fileName: "manifest.json"
         })
     ],
 
     optimization: {
-        minimizer: [
-            "...",
-            new CssMinimizerPlugin({
-                filename: "css/bundle.[contenthash].css"
-            })
-        ],
-        splitChunks: {
-            chunks: "all"
-        }
+    minimizer: [
+        "...",
+        new CssMinimizerPlugin()
+    ],
+    splitChunks: {
+        chunks: "all"
     }
+}
 };
+
+module.exports = (async () => {
+    const { WebpackManifestPlugin } = await import("webpack-manifest-plugin");
+    config.plugins.push(new WebpackManifestPlugin({ fileName: "manifest.json" }));
+    return config;
+})();

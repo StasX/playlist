@@ -1,0 +1,27 @@
+services:
+  database:
+    build: ./database
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - database-data:/var/lib/mysql
+  app:
+    build: .
+    volumes:
+      - ./:/var/www/html
+  nginx:
+    build: ./nginx
+    ports:
+      - "8090:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - app
+
+volumes:
+  database-data:

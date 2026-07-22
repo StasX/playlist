@@ -3,3 +3,11 @@ node_modules/
 .gitignore
 .git/
 vendor/
+.env
+.env.*
+README.md
+tests/
+Dockerfile
+.dockerignore
+database/
+*.log

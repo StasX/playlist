@@ -4,5 +4,7 @@ public/fonts/
 public/assets/
 public/js/
 public/css/
+public/images/
 public/manifest.json
-storage/logs/*.log
+*.log
+.env
