@@ -6,6 +6,10 @@ vendor/
 .env
 .env.*
 README.md
+public/*
+!public/index.php
+!public/favicon.ico
+!public/robots.txt
 tests/
 Dockerfile
 .dockerignore

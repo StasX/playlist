@@ -1,4 +1,4 @@
-FROM node:20.6.0-alpine3.18 AS frontend-builder
+FROM node:26.5.0-alpine AS frontend-builder
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ RUN npm ci
 
 COPY . .
 
-RUN npm run build
+RUN /bin/sh -c "npm run build"
 
 RUN rm -rf node_modules \
     && rm -f package.json package-lock.json
