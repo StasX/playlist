@@ -5,3 +5,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY playlistDB.sql /docker-entrypoint-initdb.d/init.sql
+EXPOSE 3306

@@ -1,15 +1,4 @@
 services:
-  database:
-    build: ./database
-    environment:
-      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MARIADB_DATABASE: ${DB_DATABASE}
-      MARIADB_USER: ${DB_USERNAME}
-      MARIADB_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3306:3306"
-    volumes:
-      - database-data:/var/lib/mysql
   app:
     build: .
     environment:
@@ -20,8 +9,26 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_CHARSET: ${DB_CHARSET}
       DB_COLLATION: ${DB_COLLATION}
+    depends_on:
+      - database
+    networks:
+      - app-network
+      - web-network
+
+  database:
+    build: ./database
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    # ports:
+    #   - "3306:3306"
     volumes:
-      - ./:/var/www/html
+      - database-data:/var/lib/mysql
+    networks:
+      - app-network
+
   nginx:
     build: ./nginx
     ports:
@@ -30,6 +37,12 @@ services:
       - ./:/var/www/html
     depends_on:
       - app
+    networks:
+      - web-network
 
 volumes:
   database-data:
+
+networks:
+  app-network:
+  web-network:
