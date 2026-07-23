@@ -1,28 +1,30 @@
-@use "sass:color";
 @use "../base/variables";
 
 .btn-orange {
-    background-color: variables.$orange;
-    color: white !important;
+  background-color: variables.$primary-orange;
+  color: variables.$white !important;
+  border: none;
 
-    &:hover {
-        background-color: color.scale(variables.$orange, $lightness: 20%);
-    }
+  &:hover {
+    background-color: variables.$hover-orange;
+  }
 
-    &:active {
-        background-color: color.scale(variables.$orange, $lightness: 45%) !important;
-    }
+  &:active {
+    background-color: variables.$active-orange !important;
+  }
 }
 
 .btn-link {
-    color: variables.$orange;
-    font-weight: bolder;
-    border: none !important;
-    &:hover {
-        color: color.scale(variables.$orange, $lightness: 20%);
-    }
+  border: none !important;
+  color: variables.$primary-orange;
+  font-weight: bolder;
+  text-decoration: none;
 
-    &:active {
-        color: color.scale(variables.$orange, $lightness: 45%) !important;
-    }
+  &:hover {
+    color: variables.$hover-orange;
+  }
+
+  &:active {
+    color: variables.$active-orange !important;
+  }
 }

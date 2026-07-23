@@ -1,17 +1,43 @@
-node_modules/
-.editorconfig
+# Git
+.git
 .gitignore
-.git/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Composer
 vendor/
+
+# Environment
 .env
 .env.*
+
+# IDE
+.editorconfig
+.vscode/
+.idea/
+
+# Documentation
 README.md
+
+# Logs
+*.log
+
+# Tests
+tests/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose*.yml
+
+# Database files (if your database directory only contains local data)
+database/
+
+# Build output (Webpack will recreate these)
 public/*
 !public/index.php
 !public/favicon.ico
 !public/robots.txt
-tests/
-Dockerfile
-.dockerignore
-database/
-*.log
