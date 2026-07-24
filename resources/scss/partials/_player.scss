@@ -1,0 +1,78 @@
+@use "../base/variables";
+
+#player-container {
+  margin-top: 8px;
+
+  .album-cover {
+    display: inline-block;
+    position: relative;
+    width: 200px;
+    height: 200px;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin: 0;
+      padding: 0;
+      border-radius: 50%;
+    }
+  }
+
+  ol {
+    position: relative;
+    padding: 0 50px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    li {
+      height: 24px;
+    }
+  }
+
+  .list-playing {
+    position: absolute;
+    left: 0;
+    padding-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+
+    &:not(.fa-pause) {
+      color: variables.$primary-orange;
+    }
+  }
+}
+
+// Custom styling for standard audio tag (Invert filter removed)
+audio {
+  width: 100%;
+  max-width: 424px;
+  border-radius: 30px;
+  outline: none;
+}
+
+.rotation {
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}

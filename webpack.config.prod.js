@@ -16,9 +16,12 @@ module.exports = async () => {
         output: {
             path: path.resolve(__dirname, "public"),
             publicPath: "/",
-            filename: "js/main.[contenthash].js",
-            clean: false,
-            assetModuleFilename: "assets/[name].[contenthash][ext]"
+            filename: "js/[name].[contenthash:8].js",
+            chunkFilename: "js/[name].[contenthash:8].chunk.js",
+            clean: {
+                keep: /^(index\.php|favicon\.ico|robots\.txt)$/
+            },
+            assetModuleFilename: "assets/[name].[contenthash:8][ext]"
         },
 
         module: {
@@ -26,6 +29,18 @@ module.exports = async () => {
                 {
                     test: /\.html$/i,
                     type: "asset/source"
+                },
+                {
+                    test: /\.css$/i,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        {
+                            loader: "css-loader",
+                            options: {
+                                sourceMap: true
+                            }
+                        }
+                    ]
                 },
                 {
                     test: /\.scss$/i,
@@ -64,7 +79,8 @@ module.exports = async () => {
 
         plugins: [
             new MiniCssExtractPlugin({
-                filename: "css/main.[contenthash].css"
+                filename: "css/[name].[contenthash:8].css",
+                chunkFilename: "css/[name].[contenthash:8].chunk.css"
             }),
 
             new webpack.ProvidePlugin({
@@ -83,10 +99,7 @@ module.exports = async () => {
             minimizer: [
                 "...",
                 new CssMinimizerPlugin()
-            ],
-            splitChunks: {
-                chunks: "all"
-            }
+            ]
         }
     };
 };

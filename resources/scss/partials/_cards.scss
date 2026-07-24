@@ -1,0 +1,47 @@
+.quadratic-card {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 1.25rem;
+  }
+}
+
+.card-container {
+  margin-top: 10px;
+
+  .disk-image {
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-row {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+
+  &:hover {
+    .disk-image {
+      opacity: 1;
+    }
+
+    .btn-row {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .card {
+      box-shadow: 2px 1px hsla(0, 0%, 53.3%, 0.45);
+    }
+  }
+}

@@ -1,0 +1,20 @@
+@use "../base/variables";
+
+.form-control {
+  border: 1px solid variables.$primary-orange;
+  outline: 0 none transparent !important;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: border-color 0.2s ease, padding 0.2s ease;
+
+  &:hover {
+    border: 2px solid variables.$hover-orange !important;
+    padding: 5px 11px; // Compensate 1px border growth to avoid jitter
+  }
+
+  &:active,
+  &:focus {
+    border: 2px solid variables.$active-orange !important;
+    padding: 5px 11px;
+  }
+}

@@ -10,9 +10,13 @@ module.exports = {
 
     output: {
         path: path.resolve(__dirname, "public"),
-        filename: "js/main.js",
-        clean: false,
-        assetModuleFilename: "assets/[name][ext]"
+        publicPath: "/",
+        filename: "js/[name].[contenthash:8].js",
+        chunkFilename: "js/[name].[contenthash:8].chunk.js",
+        clean: {
+            keep: /^(index\.php|favicon\.ico|robots\.txt)$/
+        },
+        assetModuleFilename: "assets/[name].[contenthash:8][ext]"
     },
 
     module: {
@@ -22,7 +26,7 @@ module.exports = {
                 type: "asset/source",
             },
             {
-                test: /\.scss$/i,
+                test: /\.s?css$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
                     "css-loader",
@@ -35,13 +39,21 @@ module.exports = {
                 generator: {
                     filename: "fonts/[name][ext]"
                 }
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg|webp)$/i,
+                type: "asset/resource",
+                generator: {
+                    filename: "images/[name][ext]"
+                }
             }
         ]
     },
 
     plugins: [
         new MiniCssExtractPlugin({
-            filename: "css/main.css"
+            filename: "css/[name].[contenthash:8].css",
+            chunkFilename: "css/[name].[contenthash:8].chunk.css"
         }),
         new webpack.ProvidePlugin({
             $: "jquery",

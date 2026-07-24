@@ -1,0 +1,9 @@
+@use "../base/variables";
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid variables.$primary-orange;
+  padding: 0.5rem 1rem;
+}
