@@ -31,6 +31,8 @@ function displayPlaylist(playlist, element) {
                                         <i class="fa-solid fa-x"></i>
                                     </button>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col">
                                     <button class="play">
                                         <i class="fa-solid fa-play"></i>
