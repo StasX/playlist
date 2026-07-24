@@ -1,6 +1,9 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: PHP
     environment:
       DB_HOST: database
       DB_PORT: ${DB_PORT}
@@ -28,7 +31,10 @@ services:
       - app-network
 
   nginx:
-    build: ./nginx
+    build:
+        context: .
+        dockerfile: Dockerfile
+        target: WEB
     ports:
       - "8090:80"
     depends_on:

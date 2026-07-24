@@ -1,4 +1,4 @@
-FROM node:26.5.0-alpine AS frontend-builder
+FROM node:26.5.0-alpine AS FRONTEND-BUILDER
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ RUN rm -rf node_modules \
     && rm -f package.json package-lock.json
 
 
-FROM composer:2.10 AS backend-builder
+FROM composer:2.10 AS BACKEND-BUILDER
 
 WORKDIR /app
 
@@ -25,14 +25,14 @@ RUN composer install \
     --no-interaction \
     --no-progress
 
-COPY --from=frontend-builder /app .
+COPY --from=FRONTEND-BUILDER /app .
 
 RUN composer dump-autoload \
     --optimize \
     --classmap-authoritative
 
 
-FROM php:8.3-fpm-alpine3.24
+FROM php:8.3-fpm-alpine3.24 AS PHP
 
 RUN apk add --no-cache \
         $PHPIZE_DEPS \
@@ -41,7 +41,7 @@ RUN apk add --no-cache \
 
 WORKDIR /var/www/html
 
-COPY --from=backend-builder /app .
+COPY --from=BACKEND-builder /app .
 
 RUN mkdir -p storage/logs \
     && touch storage/logs/app.log \
@@ -56,3 +56,10 @@ RUN sed -i 's/^listen = .*/listen = 0.0.0.0:9000/' \
 EXPOSE 9000
 
 CMD ["php-fpm"]
+
+
+FROM nginx:1.31.3-alpine3.24 AS WEB
+RUN apk update && apk upgrade --no-cache
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=BACKEND-BUILDER /app/public /var/www/html/public
+EXPOSE 80
