@@ -1,24 +1,27 @@
 @use "./partials/navbar";
 @use "./partials/buttons";
 @use "./partials/forms";
-@use "./partials/disk";      
+@use "./partials/disk";
 @use "./partials/dialogs";
 @use "./partials/player";
 @use "./partials/cards";
 
 body,
 html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
-*{
+
+* {
     position: relative;
 }
+
 button,
 input {
-  &:focus,
-  &:active {
-    outline: none;
-  }
+
+    &:focus,
+    &:active {
+        outline: none;
+    }
 }

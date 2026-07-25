@@ -1,30 +1,30 @@
 @use "../base/variables";
 
 .btn-orange {
-  background-color: variables.$primary-orange;
-  color: variables.$white !important;
-  border: none;
+    background-color: variables.$primary-orange;
+    color: variables.$white !important;
+    border: none;
 
-  &:hover {
-    background-color: variables.$hover-orange;
-  }
+    &:hover {
+        background-color: variables.$hover-orange;
+    }
 
-  &:active {
-    background-color: variables.$active-orange !important;
-  }
+    &:active {
+        background-color: variables.$active-orange !important;
+    }
 }
 
 .btn-link {
-  border: none !important;
-  color: variables.$primary-orange;
-  font-weight: bolder;
-  text-decoration: none;
+    border: none !important;
+    color: variables.$primary-orange;
+    font-weight: bolder;
+    text-decoration: none;
 
-  &:hover {
-    color: variables.$hover-orange;
-  }
+    &:hover {
+        color: variables.$hover-orange;
+    }
 
-  &:active {
-    color: variables.$active-orange !important;
-  }
+    &:active {
+        color: variables.$active-orange !important;
+    }
 }
