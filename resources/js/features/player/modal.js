@@ -13,14 +13,31 @@ function createModal(playlist) {
         allowOutsideClick: false,
         allowEnterKey: true,
         didOpen: () => {
+            function calcTime(totalSeconds) {
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = Math.floor(totalSeconds % 60);
+                const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+                const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+                return `${formattedMinutes}:${formattedSeconds}`;
+            }
+            let interval;
+            let muted = false;
+            let songDuration = "00:00 / 00:00";
             const popup = $(Swal.getPopup());
             popup.css({ "width": "800px", "border-radius": "300px" });
             const image = popup.find("img");
             image.attr("src", playlist.image);
             const nowPlaying = popup.find("h5");
             const songsList = popup.find("ol");
+            const playPauseButton = popup.find("#play-pause");
+            const audioPlayPause = popup.find("#audio-play-pause");
+            const duration = popup.find("#duration");
+            const tracker = popup.find("#tracker");
+            const muteButton = popup.find("#mute");
+            const vol = popup.find("#vol");
+
             songName = playlist.songs[0]?.name || "";
-            const audio = popup.find("audio");
+            const audio = $('<audio/>');
 
             $.each(playlist.songs, (i, song) => {
                 songsList.append(`<li>${song.name}</li>`)
@@ -32,23 +49,76 @@ function createModal(playlist) {
             let currentSongName = playlist.songs[currentSong].name
             nowPlaying.text(`Now playing: ${currentSongName}`);
             $("title").text(`Playing: ${currentSongName}`);
-            song.play();
-            const playPauseButton = popup.find("#play-pause");
+            audio.ready(() => {
+                song.play();
+            });
+
             audio.on("play", () => {
-                playPauseButton.html('<i class="fa-solid fa-pause"></i>');
+                const pauseClass = "fa-solid fa-pause";
+                audioPlayPause.attr('class', pauseClass);
+                playPauseButton.html(`<i class="${pauseClass}"></i>`);
                 image.addClass("rotation");
-                const songContainer=songsList.find(`li:nth-child(${currentSong+1})`);
-                songContainer.html(`<i class="fa-solid fa-play list-playing" style="top:${currentSong*24}"></i>${currentSongName}`);
+                const songContainer = songsList.find(`li:nth-child(${currentSong + 1})`);
+                songContainer.html(`<i class="fa-solid fa-play list-playing" style="top:${currentSong * 24}"></i>${currentSongName}`);
+                const time = calcTime(audio[0].currentTime);
+                tracker.val(audio[0].currentTime);
+                duration.text(`${time} / ${songDuration}`);
+                interval = setInterval(() => {
+                    const time = calcTime(audio[0].currentTime);
+                    tracker.val(audio[0].currentTime);
+                    duration.text(`${time} / ${songDuration}`);
+                }, 1000);
             });
             audio.on("pause", () => {
-                console.log("paused")
-                playPauseButton.html('<i class="fa-solid fa-play"></i>');
-                const songContainer=songsList.find(`li:nth-child(${currentSong+1})`);
-                songContainer.html(`<i class="fa-solid fa-pause list-playing" style="top:${currentSong*24}"></i>${currentSongName}`);
+                const playClass = "fa-solid fa-play";
+                audioPlayPause.attr('class', playClass);
+                playPauseButton.html(`<i class="${playClass}"></i>`);
+                const songContainer = songsList.find(`li:nth-child(${currentSong + 1})`);
+                songContainer.html(`<i class="fa-solid fa-pause list-playing" style="top:${currentSong * 24}"></i>${currentSongName}`);
                 image.removeClass("rotation");
+                clearInterval(interval);
             });
+
+            audio.on('loadedmetadata', () => {
+                songDuration = calcTime(audio[0].duration);
+                tracker.attr("max", Math.floor(audio[0].duration));
+                duration.text(`00:00 / ${songDuration}`);
+                vol.val(audio[0].volume);
+            });
+
             playPauseButton.click(() => {
                 song.paused ? song.play() : song.pause();
+            });
+
+            audioPlayPause.click(() => {
+                song.paused ? song.play() : song.pause();
+            });
+            tracker.on("change", () => {
+                audio[0].currentTime = tracker.val();
+            });
+            muteButton.click(() => {
+                muted = !muted;
+                if (muted) {
+                    audio.attr("muted", "muted");
+                    muteButton.removeClass("fa-volume-high");
+                    muteButton.addClass("fa-volume-xmark");
+                    return;
+                }
+                audio.removeAttr("muted");
+                muteButton.removeClass("fa-volume-xmark");
+                muteButton.addClass("fa-volume-high");
+            });
+            vol.on("change", () => {
+
+                const volume = vol.val();
+                audio[0].volume = volume;
+                if (volume == 0) {
+                    muteButton.removeClass("fa-volume-high");
+                    muteButton.addClass("fa-volume-xmark");
+                    return;
+                }
+                muteButton.removeClass("fa-volume-xmark");
+                muteButton.addClass("fa-volume-high");
             });
         },
     });
