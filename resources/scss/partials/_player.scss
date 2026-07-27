@@ -61,20 +61,90 @@
         height: 54px;
         border-radius: 300px;
         background-color: #e3e3e3;
-        width: 400px;
+        width: 450px;
         padding: 0 20px;
-        .col{
-            padding:0;
+
+        &>.row {
+            vertical-align: middle;
+            height: 30px;
+            margin-top: 12px;
         }
-#tracker{
-    width:150px;
-}
-#vol{
-    width:60px;
-}
-span{
-    font-size: 12px;
-}
+
+        .col {
+            padding: 0;
+        }
+
+        .col:first-child {
+            max-width: 48px;
+        }
+
+        .col:nth-child(3) {
+            max-width: 100px;
+        }
+
+        #tracker {
+            width: 150px;
+        }
+
+        #vol {
+            width: 60px;
+        }
+
+        span {
+            font-size: 12px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+
+            &:focus {
+                outline: none;
+            }
+
+            &::-webkit-slider-runnable-track {
+                background: variables.$active-orange;
+                height: 8px;
+                border-radius: 4px;
+
+            }
+
+            &::-moz-range-track {
+                background: variables.$active-orange;
+                height: 8px;
+                border-radius: 4px;
+            }
+
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                background: variables.$primary-orange;
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                margin-top: -6px;
+                transition: background 0.15s ease-in-out;
+            }
+
+            &::-moz-range-thumb {
+                border: none;
+                background: variables.$primary-orange;
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                transition: background 0.15s ease-in-out;
+            }
+
+            &:hover::-webkit-slider-thumb {
+                background: variables.$hover-orange;
+            }
+
+            &:hover::-moz-range-thumb {
+                background: variables.$hover-orange;
+            }
+        }
     }
 }
 
