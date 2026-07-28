@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /playlists
+Disallow: /playlists/
+Disallow: /playlist/
