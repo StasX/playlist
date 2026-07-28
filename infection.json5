@@ -1,0 +1,43 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+
+    "source": {
+        "directories": [
+            "app"
+        ],
+        "excludes": [
+            "storage",
+            "vendor",
+            "tests"
+        ]
+    },
+
+    "logs": {
+        "text": "storage/logs/infection.log",
+        "summary": "storage/logs/infection-summary.log",
+        "html": "storage/logs/infection.html",
+        "json": "storage/logs/infection.json"
+    },
+
+    "tmpDir": "storage/infection",
+
+    "threads": "max",
+
+    "testFramework": "phpunit",
+
+    "phpUnit": {
+        "configDir": ".",
+        "customPath": "vendor/bin/phpunit"
+    },
+
+    "timeout": 10,
+
+    "minMsi": 80,
+    "minCoveredMsi": 90,
+
+    "ignoreMsiWithNoMutations": true,
+
+    "mutators": {
+        "@default": true
+    }
+}
