@@ -5,6 +5,7 @@
 @use "./partials/dialogs";
 @use "./partials/player";
 @use "./partials/cards";
+@use "./partials/side-buttons";
 
 body,
 html {
@@ -24,7 +25,4 @@ input {
     &:active {
         outline: none;
     }
-}
-.swal2-html-container{
-    overflow: hidden;
 }

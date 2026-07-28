@@ -1,5 +1,15 @@
 @use "../base/variables";
 
+.player-popup {
+    overflow: visible !important;
+    border-radius: 300px;
+}
+
+.player-html-container {
+    position: relative;
+    overflow: visible !important;
+}
+
 #player-container {
     margin-top: 8px;
 
@@ -61,7 +71,8 @@
         height: 54px;
         border-radius: 300px;
         background-color: #e3e3e3;
-        width: 450px;
+        margin:0;
+        width: 400px;
         padding: 0 20px;
 
         &>.row {
@@ -87,7 +98,8 @@
         }
 
         #vol {
-            width: 60px;
+            width: 50px;
+            margin-right: 5px;
         }
 
         span {
