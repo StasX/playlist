@@ -1,0 +1,23 @@
+includes:
+    - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: 10
+
+    paths:
+        - app
+        - bootstrap
+        - config
+        - public/index.php
+
+    tmpDir: storage/phpstan
+
+    excludePaths:
+        analyse:
+            - storage/*
+            - public/js/*
+            - public/css/*
+
+    reportUnmatchedIgnoredErrors: true
