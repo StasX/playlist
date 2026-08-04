@@ -1,12 +1,14 @@
 
 @Library([
-    'installers_lib',
-    'docker-lib',
-    'quality-lib',
-    'security-lib'
+    'installers',
+    'dockerizer',
+    'code-qualities',
+    'securityscans',
+    'test-suite'
     ]) _
-def dockerRepo = "sm1986"
-
+def image = 'sm1986/playlist'
+def version = '1.0.0'
+def envName = 'dev'
 
 podTemplate(cloud: 'kubernetes', containers: [
     containerTemplate(
@@ -17,7 +19,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         name: 'docker', 
         image: 'docker:26-dind',
         privileged: true,
-        args: '--storage-driver=vfs --host=tcp://0.0.0.0:2375'
+        args: '--storage-driver=vfs'
     ),
     containerTemplate(
         name: 'alpine', 
@@ -60,40 +62,46 @@ podTemplate(cloud: 'kubernetes', containers: [
                 checkout scm
             }
         }
-        stage("Environment preparations"){
+        stage('Environment preparations'){
             parallel(
-                "Install Checkov" : {
+                'Install Checkov' : {
                     container('checkov') {
-                        installers.installCheckov()
+                        InstallersForPythonBasedTools.installCheckov()
                     }
                 },
-                "Install composer packages" : {
+                'Install composer packages' : {
                     container('composer') {
-                        installers.installComposer()
+                        InstallersForPHPBasedTools.installAll(true, true)
                     }
                 },
-                "Install Semgrep" : {
+                'Install Semgrep' : {
                     container('semgrep') {
-                        installers.installSemgrep()
+                        InstallersForPythonBasedTools.installSemgrep()
                     }
                 },
-                "Install Trivy" : {
+                'Install Trivy' : {
                     container('docker') {
-                        installers.installTrivy()
+                        InstallersForDockerBasedTools.installTrivy()
                     }
                 }
             )
         },
-        stage("Code Quality "){
+        stage('Code Quality '){
             paralel(
-                "PHP CS Fixer Testing" : {
-                    container("composer"){
-                        quality.testPHP()
+                'PHP CS Fixer Testing' : {
+                    container('composer'){
+                        PHPCodeQuality.phpCSFixerTesting()
                     }
                 },
-                "PHP_CodeSniffer Testing" : {
-                    container("composer"){
-                        quality.phpCodeSniffer()
+                'PHP_CodeSniffer Testing' : {
+                    container('composer'){
+                        PHPCodeQuality.phpCodeSnifferTesting()
+                    }
+                },
+                'PHPStan Testing': {
+                    container('phpstan') {
+                        echo 'Running PHP Stan Static Analysis...'
+                        PHPSecurityScans.phpStanScan()
                     }
                 }
             )
@@ -101,73 +109,89 @@ podTemplate(cloud: 'kubernetes', containers: [
         },
         stage('Security Scans') {
             parallel(
-                'PHPStan Testing': {
-                    container('phpstan') {
-                        echo "Running Bandit Python Static Analysis..."
-                        security.banditScan()
+                'Composer Audit':{
+                    container('composer') {
+                        echo 'Running Composer Audit...'
+                        PHPSecurityScans.composerAudit()
                     }
                 },
-                'Checkov Testing': {
-                    container('checkov') {
-                        echo "Running Checkov on Dockerfile..."
-                        security.checkovScan("Dockerfile", "-f", "dockerfile")
-                    }
-                },
-                'Semgrep Testing': {
+                'Semgrep Scan for PHP': {
                     container('semgrep') {
-                        echo "Running Semgrep Scans..."
-                        security.semgrepScan()
+                        echo 'Running Semgrep Scans...'
+                        PHPSecurityScans.semgrepScan()
+                    }
+                },
+                'Checkov Scans for Dockerfile': {
+                    container('checkov') {
+                        echo 'Running Checkov on Dockerfile...'
+                        DockerSecurityScans.checkovScan('Dockerfile')
+                    }
+                },
+                'Checkov Scans for docker-compose.yml': {
+                    container('checkov') {
+                        echo 'Running Checkov on docker compose file...'
+                        DockerSecurityScans.checkovScan('docker-compose.yml')
+                    }
+                },
+                'Semgrep Scans for Docker': {
+                    container('semgrep') {
+                        echo 'Running Semgrep Scans...'
+                        DockerSecurityScans.semgrepScan()
                     }
                 }
             )
         },
-        stage ("PHPUnit  and Infection Tests"){
+        stage ('PHPUnit  and Infection Tests'){
             parallel(
-                "PHPUnit Tests" : {
-                    container("composer") {
-                        quality.phpUnitTests()
+                'PHPUnit Tests' : {
+                    container('composer') {
+                        PHPTests.phpUnitTesting()
                     }
                 },
-                "Infection Tests" : {
-                    container("composer") {
-                        quality.infectionTests()
+                'Infection Tests' : {
+                    container('composer') {
+                        PHPTests.infectionTesting()
                     }
                 }
             )
         }
         stage('Build Docker Image') {
             container('docker') {
-              dockers.build(dockerRepoOwner, image, version, envName, envShortName)
+              Dockerizer.buildImage(image, version, envName)
             }
         }
-        stage("Run Trivy scan, login to Docker and tag Docker Image"){
+        stage('Run Trivy scan, login to Docker and tag Docker Image'){
             parallel(
                 'Trivy Scan' : {
                     container('docker') {
-                        echo "Running Trivy vulnerability scan on the built image..."
-                        security.trivyScanImage(dockerRepoOwner, image, version, envName, envShortName)
+                        echo 'Running Trivy vulnerability scan on the built image...'
+                        if (envName != 'prod') {
+                            DockerSecurityScans.trivyScanImage(image, "${version}-${envName}")
+                        } else {
+                            DockerSecurityScans.trivyScanImage(image, version)
+                        }
                     }
                 },
                 'Tag Docker Image' : {
-                    container('docker') {              
-                        dockers.tag(dockerRepoOwner, image, version, envName, envShortName)
-                    }
+                    container('docker') {
+                        Dockerizer.tagImage(image, version, envName)
+                    }    
                 },
                 'Login to Docker repository' : {
                     container('docker') {              
-                        dockers.login()
+                        Dockerizer.login()
                     }
                 }           
             )
-        }
+        },
         stage('Push Docker Image'){
             container('docker') {              
-                 dockers.push(dockerRepoOwner, image, version, envName, envShortName)
+                 Dockerizer.push(image, version, envName)
             }
         },
         stage('Cleanup Workspace') {
             container('alpine') {
-                echo "Cleaning up workspace..."
+                echo 'Cleaning up workspace...'
                 cleanWs(
                     cleanWhenNotBuilt: true,
                     deleteDirs: true,
