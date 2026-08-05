@@ -44,7 +44,7 @@ function displayPlaylist(playlist, element) {
                 </div>
             </div>
     `);
-    const cardContainer = element || $('<div class="col-lg-3 col-md-4 col-sm-6 col-12 card-container"></div>');
+    const cardContainer = element || $('<div class="col-lg-4 col-md-6 col-sm-12 col-12 card-container"></div>');
     cardContainer.html(card);
     if (!element) $('#main-container>div').append(cardContainer);
     const arcText = cardContainer.find(".arc-text");
