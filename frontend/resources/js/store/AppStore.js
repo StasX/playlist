@@ -17,13 +17,12 @@ class AppStore {
     }
     getPlaylist(id) {
         if (isNaN(id) || id < 0) return null;
-        return this.getPlaylists().find((element) => element.id == id);
+        return this._state.playlists.find((element) => element.id == id);
     }
 
     setPlaylists(data) {
         if (
             !Array.isArray(data) ||
-            !data.length ||
             data.some((element) => typeof element !== "object" || element === null)
         ) {
             return false;
@@ -37,8 +36,8 @@ class AppStore {
             return false;
         }
         const index = this._state.playlists.findIndex((element) => element.id == data.id);
-        if (!index == -1) return false;
-        this._state.playlists.push({ ...data.name });
+        if (index !== -1) return false;
+        this._state.playlists.push({ ...data, songs: [...data.songs] });
         return true;
     }
 
@@ -54,7 +53,7 @@ class AppStore {
     }
     removePlaylist(id) {
         if (isNaN(id) || id < 0) return false;
-        const index = this._state.playlists.findIndex((element) => element.id === id);
+        const index = this._state.playlists.findIndex((element) => element.id == id);
         if (index == -1) return false;
         this._state.playlists.splice(index, 1);
         return true;
@@ -70,7 +69,7 @@ class AppStore {
             return false;
         }
         const index = this._state.playlists.findIndex((element) => element.id == data.id);
-        if (index == -1 || !data.name || !data.image) return false;
+        if (index == -1) return false;
         this._state.playlists[index].songs = [...data.songs];
         return true;
     }

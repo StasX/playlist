@@ -3,7 +3,7 @@ const Swal = require('sweetalert2');
 const html = require("../../../views/modals/playlist.html");
 const { addSongs } = require("../songs/add");
 const { playlistApi } = require("../../api/playlistApi");
-const { displayPlaylist } = require("../../ui/display");
+const { displayPlaylists } = require("../../ui/display");
 const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
 const { success} = require("../../utils/messages/success");
 const {fail} = require("../../utils/messages/fail");
@@ -39,7 +39,7 @@ function addPlaylist(playlists) {
                         playlist.id=data.id;
                         const store = AppStore.getInstance();
                         store.addPlaylist(playlist)
-                        displayPlaylist(playlist);
+                        displayPlaylists();
                         success("Playlist saved successfully!");
                     }).fail(fail);
                 }
