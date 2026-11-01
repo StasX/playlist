@@ -47,8 +47,15 @@ function createModal(playlist) {
             const audio = $('<audio/>');
 
             $.each(playlist.songs, (i, song) => {
-                songsList.append(`<li>${song.name}</li>`)
-                audio.append(`<source src="${song.url}" type="audio/mpeg">`)
+                songsList.append($("<li>").text(song.name));
+                try {
+                    const url = new URL(song.url);
+                    if (url.protocol === "http:" || url.protocol === "https:") {
+                        audio.append($("<source>").attr("src", url.href).attr("type", "audio/mpeg"));
+                    }
+                } catch {
+                    // Ignore invalid URLs in previously stored playlists.
+                }
             });
 
             let currentSong = 0;
@@ -66,7 +73,9 @@ function createModal(playlist) {
                 playPauseBtn.html(`<i class="${pauseClass}"></i>`);
                 image.addClass("rotation");
                 const songContainer = songsList.find(`li:nth-child(${currentSong + 1})`);
-                songContainer.html(`<i class="fa-solid fa-play list-playing" style="top:${currentSong * 24}"></i>${currentSongName}`);
+                songContainer.text(currentSongName).prepend(
+                    $("<i>").addClass("fa-solid fa-play list-playing").css("top", currentSong * 24)
+                );
                 const time = calcTime(audio[0].currentTime);
                 tracker.val(audio[0].currentTime);
                 duration.text(`${time} / ${songDuration}`);
@@ -81,7 +90,9 @@ function createModal(playlist) {
                 audioPlayPause.attr('class', playClass);
                 playPauseBtn.html(`<i class="${playClass}"></i>`);
                 const songContainer = songsList.find(`li:nth-child(${currentSong + 1})`);
-                songContainer.html(`<i class="fa-solid fa-pause list-playing" style="top:${currentSong * 24}"></i>${currentSongName}`);
+                songContainer.text(currentSongName).prepend(
+                    $("<i>").addClass("fa-solid fa-pause list-playing").css("top", currentSong * 24)
+                );
                 image.removeClass("rotation");
                 clearInterval(interval);
             });

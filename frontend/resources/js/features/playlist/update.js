@@ -14,7 +14,7 @@ function updatePlaylist(element) {
     const index = cardContainer.index();
     const store = AppStore.getInstance();
     const playlists = store.getPlaylists();
-    const playlist = playlists[index];
+    const playlist = { ...playlists[index] };
     Swal.fire({
         title: "Update playlist",
         html: html,
@@ -57,8 +57,8 @@ function updatePlaylist(element) {
             }
             playlistApi.update(id, data).done(() => {
                 store.updatePlaylist(updatedPlaylist);
-                const { displayPlaylist } = require("../../ui/display");
-                displayPlaylist(updatedPlaylist, cardContainer);
+                const { displayPlaylists } = require("../../ui/display");
+                displayPlaylists();
             }).fail(fail);
         }
     });
