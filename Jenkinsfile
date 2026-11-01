@@ -58,7 +58,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         stage('Checkout & Extract App Information') {
             container('jnlp') {                       
                 // Ensure we skip SSL if needed internally, then pull code
-                sh 'git config --global http.sslVerify false'
+                // sh 'git config --global http.sslVerify false'
                 checkout scm
             }
         }
@@ -85,7 +85,7 @@ podTemplate(cloud: 'kubernetes', containers: [
                     }
                 }
             )
-        },
+        }
         stage('Code Quality '){
             parallel(
                 'PHP CS Fixer Testing' : {
@@ -106,7 +106,7 @@ podTemplate(cloud: 'kubernetes', containers: [
                 }
             )
 
-        },
+        }
         stage('Security Scans') {
             parallel(
                 'Composer Audit':{
@@ -141,7 +141,7 @@ podTemplate(cloud: 'kubernetes', containers: [
                     }
                 }
             )
-        },
+        }
         stage ('PHPUnit  and Infection Tests'){
             parallel(
                 'PHPUnit Tests' : {
@@ -192,14 +192,14 @@ podTemplate(cloud: 'kubernetes', containers: [
                     }
                 }           
             )
-        },
+        }
         stage('Push Docker Image'){
             container('docker') {              
                  ['frontend', 'backend'].each { service ->
                      Dockerizer.push("${image}-${service}", version, envName)
                  }
             }
-        },
+        }
         stage('Cleanup Workspace') {
             container('alpine') {
                 echo 'Cleaning up workspace...'

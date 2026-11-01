@@ -25,6 +25,14 @@ Nginx serves the frontend build at `/` and forwards `/api/` requests to PHP-FPM.
 
 Nginx and PHP share `web-network`. PHP and MariaDB share the private, internal `app-network`, using `database:3306` for database connections. Only Nginx publishes a host port; neither PHP-FPM nor MariaDB is exposed to the host.
 
+## Jenkins on Kubernetes
+
+See [infra/jenkins/README.md](infra/jenkins/README.md) for the Helm bootstrap, persistent storage, port forwarding on localhost:8080, and pipeline prerequisites.
+
+```powershell
+.\infra\jenkins\bootstrap.ps1
+```
+
 ## Local development
 
 Install backend dependencies, export the database variables from `.env.example` into the PHP process environment, and provide a MariaDB database initialized with `database/playlistDB.sql`. PHP reads environment variables directly; it does not load `.env` automatically.

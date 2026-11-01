@@ -1,0 +1,259 @@
+# Loadable configuration derived from jenkins.export.yaml.
+# Admin credentials are resolved from the Helm chart Secret at runtime.
+# This file owns the controller configuration; chart JCasC defaults are disabled.
+---
+configuration-as-code:
+  deprecated: reject
+  restricted: reject
+  unknown: reject
+  version: '1'
+credentials:
+  blueOcean: {}
+  folder: {}
+  providerImpl: {}
+  system:
+    domainCredentials:
+    - domain: {}
+  user: {}
+jenkins:
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  clouds:
+  - kubernetes:
+      containerCap: 10
+      containerCapStr: '10'
+      jenkinsTunnel: jenkins-agent.jenkins.svc.cluster.local:50000
+      jenkinsUrl: http://jenkins.jenkins.svc.cluster.local:8080
+      name: kubernetes
+      namespace: jenkins
+      podLabels:
+      - key: jenkins/jenkins-jenkins-agent
+        value: 'true'
+      serverUrl: https://kubernetes.default
+      templates:
+      - containers:
+        - args: "^${computer.jnlpmac} ^${computer.name}"
+          envVars:
+          - envVar:
+              key: JENKINS_URL
+              value: http://jenkins.jenkins.svc.cluster.local:8080/
+          image: jenkins/inbound-agent:3395.v6e5377b_0fb_3c-2-jdk25
+          name: jnlp
+          resourceLimitCpu: 512m
+          resourceLimitMemory: 512Mi
+          resourceRequestCpu: 512m
+          resourceRequestMemory: 512Mi
+          workingDir: "/home/jenkins/agent"
+        id: f5757cda860458d2a9d0a20e10f7ce854cb5c245a475db531cf497797cff3dc5
+        label: jenkins-jenkins-agent
+        name: default
+        namespace: jenkins
+        nodeUsageMode: NORMAL
+        podRetention: never
+        serviceAccount: default
+        slaveConnectTimeout: 100
+        slaveConnectTimeoutStr: '100'
+        yamlMergeStrategy: override
+  crumbIssuer: standard
+  disableRememberMe: false
+  labelAtoms:
+  - name: built-in
+  - name: jenkins-jenkins-agent
+  log: {}
+  markupFormatter: plainText
+  mode: NORMAL
+  nodeMonitors:
+  - architecture
+  - clock
+  - diskSpace:
+      freeSpaceThreshold: 1GiB
+      freeSpaceWarningThreshold: 2GiB
+  - swapSpace
+  - tmpSpace:
+      freeSpaceThreshold: 1GiB
+      freeSpaceWarningThreshold: 2GiB
+  - responseTime
+  numExecutors: 0
+  primaryView:
+    all:
+      name: all
+  projectNamingStrategy: standard
+  quietPeriod: 5
+  remotingSecurity:
+    enabled: true
+  scmCheckoutRetryCount: 0
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+      - id: "${chart-admin-username}"
+        name: Jenkins Admin
+        password: "${chart-admin-password}"
+  slaveAgentPort: 50000
+  updateCenter:
+    sites:
+    - id: default
+      url: https://updates.jenkins.io/update-center.json
+  views:
+  - all:
+      name: all
+  viewsTabBar: standard
+globalCredentialsConfiguration:
+  configuration:
+    providerFilter: none
+    typeFilter: none
+appearance:
+  consoleUrlProvider: {}
+  prism:
+    theme: PRISM
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  apiTokenProperty: {}
+  contentSecurityPolicy:
+    enforce: false
+  cps:
+    hideSandbox: false
+  crumb: {}
+  gitHooks:
+    allowedOnAgents: false
+    allowedOnController: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: knownHostsFileVerificationStrategy
+  prism:
+    protectSourceCodeByPermission: false
+  queueItemAuthenticator: {}
+  sSHD:
+    port: -1
+  scriptApproval:
+    forceSandbox: false
+  updateSiteWarningsConfiguration: {}
+unclassified:
+  administrativeMonitorsConfiguration: {}
+  artifactManager: {}
+  bitbucketEndpointConfiguration:
+    endpoints:
+    - bitbucketCloudEndpoint:
+        enableCache: false
+        repositoriesCacheDuration: 0
+        teamCacheDuration: 0
+        webhook:
+          cloudWebhook:
+            enableHookSignature: false
+            manageHooks: false
+            webhooksCacheDuration: 180
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - jobBuildDiscarder
+  casCGlobalConfig: {}
+  commonConfig:
+    nodeSelection: LABEL_ONLY
+    parallel: true
+    skipRoaming: true
+    timeoutInMilliseconds: 900000
+  computerRetentionCheckInterval: {}
+  defaultDisplayUrlProvider: {}
+  defaultFolderConfiguration: {}
+  defaultView: {}
+  envVarsFilter: {}
+  fingerprints:
+    fingerprintCleanupDisabled: false
+    storage: file
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    hookUrl: http://jenkins:8080/github-webhook/
+  globalDefaultFlowDurabilityLevel: {}
+  globalLibraries:
+    libraries:
+    - defaultVersion: main
+      name: test-suite
+      retriever:
+        modernSCM:
+          scm:
+            gitSource:
+              remote: https://github.com/StasX/test-suite.git
+              traits:
+              - gitBranchDiscovery
+  globalUntrustedLibraries:
+    libraries:
+    - defaultVersion: main
+      name: securityscans
+      retriever:
+        modernSCM:
+          scm:
+            gitSource:
+              remote: https://github.com/StasX/securityscans.git
+              traits:
+              - gitBranchDiscovery
+    - defaultVersion: main
+      name: code-qualities
+      retriever:
+        modernSCM:
+          scm:
+            gitSource:
+              remote: https://github.com/StasX/code-qualities.git
+              traits:
+              - gitBranchDiscovery
+    - defaultVersion: main
+      name: dockerizer
+      retriever:
+        modernSCM:
+          scm:
+            gitSource:
+              remote: https://github.com/StasX/dockerizer.git
+              traits:
+              - gitBranchDiscovery
+    - defaultVersion: main
+      name: installers
+      retriever:
+        modernSCM:
+          scm:
+            gitSource:
+              remote: https://github.com/StasX/installers.git
+              traits:
+              - gitBranchDiscovery
+  junitTestResultStorage:
+    storage: file
+  location:
+    adminAddress: address not configured yet <nobody@nowhere>
+    url: http://jenkins:8080/
+  mailer:
+    charset: UTF-8
+    useSsl: false
+    useTls: false
+  metricsAccessKey: {}
+  myView: {}
+  nodeProperties: {}
+  plugin: {}
+  pollSCM:
+    pollingThreadCount: 10
+  prePostClean: {}
+  projectNamingStrategy: {}
+  proxyConfigurationManager: {}
+  quietPeriod: {}
+  resourceRoot: {}
+  scmGit:
+    addGitTagAction: false
+    allowSecondFetch: false
+    createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    hideCredentials: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
+  scmRetryCount: {}
+  shell: {}
+  usageStatistics: {}
+  viewsTabBar: {}
+tool:
+  git:
+    installations:
+    - home: git
+      name: Default
+  mavenGlobalConfig:
+    globalSettingsProvider: standard
+    settingsProvider: standard
