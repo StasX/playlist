@@ -1,5 +1,6 @@
 node_modules/
 vendor/
+backend/.phpunit.cache/
 backend/public/fonts/
 backend/public/assets/
 backend/public/js/

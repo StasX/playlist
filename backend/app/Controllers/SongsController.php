@@ -1,7 +1,8 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\PlaylistModel;
+use App\Models\PlaylistModel as PlaylistModel;
+use App\Validation\PlaylistValidator;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -19,20 +20,19 @@ class SongsController
 
     public function updateSongs(Request $request, Response $response, array $args): Response
     {
-        if (! isset($data['songs']) || ! is_array($data['songs']) ||
-            ! array_key_exists('name', $data['songs']) ||
-            ! array_key_exists('url', $data['songs'])
+        $payload = json_decode((string) $request->getBody());
+        if (! $payload instanceof \stdClass || ! isset($payload->songs) ||
+            ! PlaylistValidator::validSongs($payload->songs) || $payload->songs === []
         ) {
             return $response->withStatus(400);
         }
+        $data = get_object_vars($payload);
         $playlist = PlaylistModel::find($args['id']);
         if (! $playlist) {
             return $response->withStatus(404);
         }
-        $data = json_decode($request->getBody(), true);
-
         $playlist->songs = json_encode($data['songs']);
         $playlist->save();
-        return $response->withStatus(202);
+        return $response->withStatus(200);
     }
 }

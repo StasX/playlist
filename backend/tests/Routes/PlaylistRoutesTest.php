@@ -98,6 +98,10 @@ final class PlaylistRoutesTest extends HttpTestCase
         $body = $this->json($response);
 
         self::assertSame(201, $response->getStatusCode());
+        self::assertStringStartsWith(
+            'application/json',
+            $response->getHeaderLine('Content-Type')
+        );
         self::assertArrayHasKey('id', $body);
         self::assertSame('Workout', $body['name']);
         self::assertSame($payload['image'], $body['image']);
