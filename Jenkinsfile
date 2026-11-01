@@ -71,7 +71,7 @@ podTemplate(cloud: 'kubernetes', containers: [
                 },
                 'Install composer packages' : {
                     container('composer') {
-                        InstallersForPHPBasedTools.installAll(true, true)
+                        dir('backend') { InstallersForPHPBasedTools.installAll(true, true) }
                     }
                 },
                 'Install Semgrep' : {
@@ -87,21 +87,21 @@ podTemplate(cloud: 'kubernetes', containers: [
             )
         },
         stage('Code Quality '){
-            paralel(
+            parallel(
                 'PHP CS Fixer Testing' : {
                     container('composer'){
-                        PHPCodeQuality.phpCSFixerTesting()
+                        dir('backend') { PHPCodeQuality.phpCSFixerTesting() }
                     }
                 },
                 'PHP_CodeSniffer Testing' : {
                     container('composer'){
-                        PHPCodeQuality.phpCodeSnifferTesting()
+                        dir('backend') { PHPCodeQuality.phpCodeSnifferTesting() }
                     }
                 },
                 'PHPStan Testing': {
-                    container('phpstan') {
+                    container('composer') {
                         echo 'Running PHP Stan Static Analysis...'
-                        PHPSecurityScans.phpStanScan()
+                        dir('backend') { PHPSecurityScans.phpStanScan() }
                     }
                 }
             )
@@ -112,19 +112,20 @@ podTemplate(cloud: 'kubernetes', containers: [
                 'Composer Audit':{
                     container('composer') {
                         echo 'Running Composer Audit...'
-                        PHPSecurityScans.composerAudit()
+                        dir('backend') { PHPSecurityScans.composerAudit() }
                     }
                 },
                 'Semgrep Scan for PHP': {
                     container('semgrep') {
                         echo 'Running Semgrep Scans...'
-                        PHPSecurityScans.semgrepScan()
+                        dir('backend') { PHPSecurityScans.semgrepScan() }
                     }
                 },
                 'Checkov Scans for Dockerfile': {
                     container('checkov') {
-                        echo 'Running Checkov on Dockerfile...'
-                        DockerSecurityScans.checkovScan('Dockerfile')
+                        ['frontend', 'backend', 'database'].each { service ->
+                            DockerSecurityScans.checkovScan("${service}/Dockerfile")
+                        }
                     }
                 },
                 'Checkov Scans for docker-compose.yml': {
@@ -145,19 +146,23 @@ podTemplate(cloud: 'kubernetes', containers: [
             parallel(
                 'PHPUnit Tests' : {
                     container('composer') {
-                        PHPTests.phpUnitTesting()
+                        dir('backend') { PHPTests.phpUnitTesting() }
                     }
                 },
                 'Infection Tests' : {
                     container('composer') {
-                        PHPTests.infectionTesting()
+                        dir('backend') { PHPTests.infectionTesting() }
                     }
                 }
             )
         }
         stage('Build Docker Image') {
             container('docker') {
-              Dockerizer.buildImage(image, version, envName)
+              ['frontend', 'backend'].each { service ->
+                  dir(service) {
+                      Dockerizer.buildImage("${image}-${service}", version, envName)
+                  }
+              }
             }
         }
         stage('Run Trivy scan, login to Docker and tag Docker Image'){
@@ -165,16 +170,20 @@ podTemplate(cloud: 'kubernetes', containers: [
                 'Trivy Scan' : {
                     container('docker') {
                         echo 'Running Trivy vulnerability scan on the built image...'
-                        if (envName != 'prod') {
-                            DockerSecurityScans.trivyScanImage(image, "${version}-${envName}")
-                        } else {
-                            DockerSecurityScans.trivyScanImage(image, version)
+                        ['frontend', 'backend'].each { service ->
+                            if (envName != 'prod') {
+                                DockerSecurityScans.trivyScanImage("${image}-${service}", "${version}-${envName}")
+                            } else {
+                                DockerSecurityScans.trivyScanImage("${image}-${service}", version)
+                            }
                         }
                     }
                 },
                 'Tag Docker Image' : {
                     container('docker') {
-                        Dockerizer.tagImage(image, version, envName)
+                        ['frontend', 'backend'].each { service ->
+                            Dockerizer.tagImage("${image}-${service}", version, envName)
+                        }
                     }    
                 },
                 'Login to Docker repository' : {
@@ -186,7 +195,9 @@ podTemplate(cloud: 'kubernetes', containers: [
         },
         stage('Push Docker Image'){
             container('docker') {              
-                 Dockerizer.push(image, version, envName)
+                 ['frontend', 'backend'].each { service ->
+                     Dockerizer.push("${image}-${service}", version, envName)
+                 }
             }
         },
         stage('Cleanup Workspace') {

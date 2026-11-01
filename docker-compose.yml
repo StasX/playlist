@@ -1,9 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: PHP
+    build: ./backend
     environment:
       DB_HOST: database
       DB_PORT: ${DB_PORT}
@@ -31,10 +28,7 @@ services:
       - app-network
 
   nginx:
-    build:
-        context: .
-        dockerfile: Dockerfile
-        target: WEB
+    build: ./frontend
     ports:
       - "8090:80"
     depends_on:
@@ -47,4 +41,5 @@ volumes:
 
 networks:
   app-network:
+    internal: true
   web-network:

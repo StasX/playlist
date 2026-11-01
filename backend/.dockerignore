@@ -1,0 +1,10 @@
+vendor/
+tests/
+storage/
+.env
+.env.*
+*.log
+Dockerfile
+.dockerignore
+public/*
+!public/index.php
