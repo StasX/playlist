@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\PlaylistModel;
+use App\Models\PlaylistModel as PlaylistModel;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -19,18 +19,24 @@ class SongsController
 
     public function updateSongs(Request $request, Response $response, array $args): Response
     {
-        if (! isset($data['songs']) || ! is_array($data['songs']) ||
-            ! array_key_exists('name', $data['songs']) ||
-            ! array_key_exists('url', $data['songs'])
+        $data = json_decode((string) $request->getBody(), true);
+        if (! is_array($data) || ! isset($data['songs']) ||
+            ! is_array($data['songs']) || ! array_is_list($data['songs']) ||
+            $data['songs'] === []
         ) {
             return $response->withStatus(400);
+        }
+        foreach ($data['songs'] as $song) {
+            if (! is_array($song) || ! isset($song['name'], $song['url']) ||
+                ! is_string($song['name']) || ! is_string($song['url'])
+            ) {
+                return $response->withStatus(400);
+            }
         }
         $playlist = PlaylistModel::find($args['id']);
         if (! $playlist) {
             return $response->withStatus(404);
         }
-        $data = json_decode($request->getBody(), true);
-
         $playlist->songs = json_encode($data['songs']);
         $playlist->save();
         return $response->withStatus(202);
