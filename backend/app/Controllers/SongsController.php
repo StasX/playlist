@@ -39,6 +39,6 @@ class SongsController
         }
         $playlist->songs = json_encode($data['songs']);
         $playlist->save();
-        return $response->withStatus(202);
+        return $response->withStatus(200);
     }
 }

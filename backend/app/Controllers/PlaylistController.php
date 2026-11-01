@@ -31,7 +31,8 @@ class PlaylistController
             ! is_array($data) ||
             ! isset($data['name']) ||
             ! isset($data['image']) ||
-            ! isset($data['songs'])
+            ! isset($data['songs']) ||
+            ! is_array($data['songs'])
         ) {
             return $response->withStatus(400);
         }
@@ -43,8 +44,10 @@ class PlaylistController
         $playlist->save();
         $response->getBody()->write(json_encode([
             'id' => $playlist->id,
+            'name' => $playlist->name,
+            'image' => $playlist->image,
         ]));
-        return $response->withStatus(201);
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
     }
 
     public function updatePlaylist(Request $request, Response $response, array $args): Response
@@ -67,7 +70,7 @@ class PlaylistController
             $playlist->songs = json_encode($data['songs']);
         }
         $playlist->save();
-        return $response->withStatus(202);
+        return $response->withStatus(200);
     }
 
     public function deletePlaylist(Request $request, Response $response, array $args): Response

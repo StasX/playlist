@@ -41,7 +41,11 @@ final class SongsRoutesTest extends HttpTestCase
         );
 
         self::assertSame(200, $response->getStatusCode());
-        self::assertSame($songs, $this->json($response));
+        self::assertStringStartsWith(
+            'application/json',
+            $response->getHeaderLine('Content-Type')
+        );
+        self::assertSame(['songs' => $songs], $this->json($response));
     }
 
     public function testGetAllSongsReturns404WhenPlaylistDoesNotExist(): void
@@ -180,7 +184,12 @@ final class SongsRoutesTest extends HttpTestCase
             'POST',
             '/playlist/999999/songs',
             [
-                'songs' => [],
+                'songs' => [
+                    [
+                        'name' => 'Song',
+                        'url' => 'https://example.com/song.mp3',
+                    ],
+                ],
             ]
         );
 
