@@ -66,22 +66,22 @@ podTemplate(cloud: 'kubernetes', containers: [
             parallel(
                 'Install Checkov' : {
                     container('checkov') {
-                        InstallersForPythonBasedTools.installCheckov()
+                        installersForPythonBasedTools.installCheckov()
                     }
                 },
                 'Install composer packages' : {
                     container('composer') {
-                        dir('backend') { InstallersForPHPBasedTools.installAll(true, true) }
+                        dir('backend') { installersForPHPBasedTools.installAll(true, true) }
                     }
                 },
                 'Install Semgrep' : {
                     container('semgrep') {
-                        InstallersForPythonBasedTools.installSemgrep()
+                        installersForPythonBasedTools.installSemgrep()
                     }
                 },
                 'Install Trivy' : {
                     container('docker') {
-                        InstallersForDockerBasedTools.installTrivy()
+                        installersForDockerBasedTools.installTrivy()
                     }
                 }
             )
