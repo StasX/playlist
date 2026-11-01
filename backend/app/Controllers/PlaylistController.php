@@ -76,10 +76,8 @@ class PlaylistController
         $playlist = PlaylistModel::find($id);
         if ($playlist) {
             $playlist->delete();
-            $response->withStatus(202);
-            return $response;
+            return $response->withStatus(204);
         }
-        $response->withStatus(400);
-        return $response;
+        return $response->withStatus(404);
     }
 }
