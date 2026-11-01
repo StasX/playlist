@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\PlaylistModel;
+use App\Validation\PlaylistValidator;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -26,16 +27,11 @@ class PlaylistController
 
     public function createPlaylist(Request $request, Response $response): Response
     {
-        $data = json_decode((string) $request->getBody(), true);
-        if (
-            ! is_array($data) ||
-            ! isset($data['name']) ||
-            ! isset($data['image']) ||
-            ! isset($data['songs']) ||
-            ! is_array($data['songs'])
-        ) {
+        $payload = json_decode((string) $request->getBody());
+        if (! $payload instanceof \stdClass || ! PlaylistValidator::validPlaylist(get_object_vars($payload))) {
             return $response->withStatus(400);
         }
+        $data = get_object_vars($payload);
 
         $playlist        = new PlaylistModel();
         $playlist->name  = $data['name'];
@@ -52,10 +48,11 @@ class PlaylistController
 
     public function updatePlaylist(Request $request, Response $response, array $args): Response
     {
-        $data = json_decode($request->getBody(), true);
-        if (! (isset($data['name']) || isset($data['image']) || isset($data['songs']))) {
+        $payload = json_decode((string) $request->getBody());
+        if (! $payload instanceof \stdClass || ! PlaylistValidator::validPlaylist(get_object_vars($payload), true)) {
             return $response->withStatus(400);
         }
+        $data = get_object_vars($payload);
         $playlist = PlaylistModel::find($args['id']);
         if (! $playlist) {
             return $response->withStatus(404);
