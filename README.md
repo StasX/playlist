@@ -41,6 +41,8 @@ Use PHP 8.5 and Composer 2, matching the backend image and Jenkins build contain
 
 Install backend dependencies, export the database variables from `.env.example` into the PHP process environment, and provide a MariaDB database initialized with `database/playlistDB.sql`. PHP reads environment variables directly; it does not load `.env` automatically.
 
+Detailed API errors are hidden by default, including when `APP_ENV` is unset. Set `APP_ENV=development` in the PHP process environment to see exception details locally. Docker Compose passes `APP_ENV` from `.env`, defaulting to `production`. Full errors continue to be logged in `backend/storage/logs/app.log`.
+
 Start the API in one terminal:
 
 ```sh

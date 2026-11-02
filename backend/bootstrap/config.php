@@ -12,7 +12,8 @@ $app->addRoutingMiddleware();
 
 /** @var \Monolog\Logger $logger */
 $logger = require __DIR__ . '/logger.php';
-$app->addErrorMiddleware(true, true, true, $logger);
+$displayErrorDetails = getenv('APP_ENV') === 'development';
+$app->addErrorMiddleware($displayErrorDetails, true, true, $logger);
 
 require __DIR__ . '/../config/routes.php';
 
