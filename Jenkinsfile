@@ -13,7 +13,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         args: '--storage-driver=vfs',
         envVars: [envVar(key: 'DOCKER_TLS_CERTDIR', value: '')]
     ),
-    containerTemplate(name: 'composer', image: 'composer:2.10.2', command: 'sleep', args: '1d'),
+    containerTemplate(name: 'composer', image: 'php:8.5-cli-alpine', command: 'sleep', args: '1d'),
     containerTemplate(name: 'checkov', image: 'python:3.13', command: 'sleep', args: '1d'),
     containerTemplate(name: 'semgrep', image: 'python:3.13', command: 'sleep', args: '1d')
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
@@ -37,14 +37,7 @@ podTemplate(cloud: 'kubernetes', containers: [
                     },
                     'Install PHP dependencies': {
                         container('composer') {
-                            sh '''
-                                apk add --no-cache --virtual .ci-build-deps $PHPIZE_DEPS
-                                docker-php-ext-install pdo_mysql
-                                pecl install pcov
-                                docker-php-ext-enable pcov
-                                apk del .ci-build-deps
-                                mkdir -p backend/storage/logs
-                            '''
+                            sh 'sh infra/php/prepare-php.sh'
                             dir('backend') { installersForPHPBasedTools.installAll(true, true) }
                         }
                     },
@@ -172,6 +165,10 @@ podTemplate(cloud: 'kubernetes', containers: [
             }
         } finally {
             stage('Cleanup Workspace') {
+                // Root-owned build directories must be writable by the inbound agent.
+                container('composer') {
+                    sh(returnStatus: true, script: 'find . -type d -exec chmod a+rwx {} +')
+                }
                 cleanWs(deleteDirs: true, disableDeferredWipeout: true, notFailBuild: true)
             }
         }

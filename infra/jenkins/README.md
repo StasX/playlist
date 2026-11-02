@@ -74,12 +74,28 @@ The loaded configuration creates a Kubernetes cloud named `kubernetes`, matching
 
 Before running this project's pipeline:
 
-1. The bootstrap configures `installers`, `dockerizer`, `code-qualities`, `securityscans`, and `test-suite` from their exported GitHub URLs on branch `main`. Their source is external to this repository. Update the loadable JCasC file if those repositories, branches, or credential IDs change.
-2. Add the registry credentials expected by `Dockerizer.login()` and any additional credentials required by those libraries. Check their implementation for credential IDs.
-3. Create a **Pipeline** job using **Pipeline script from SCM**, point it at this repository, and set the script path to `Jenkinsfile`.
-4. Provide a separate MariaDB test database reachable from the build agents with the settings in `backend/phpunit.xml`. This bootstrap installs Jenkins only.
+1. The Jenkinsfile loads `installers`, `dockerizer`, `code-qualities`, and `securityscans` from their configured GitHub repositories on branch `main`. The bootstrap also retains `test-suite` in the exported controller configuration, but the pipeline runs PHPUnit and Infection directly. These libraries are external to this repository; update the loadable JCasC file if their repositories, branches, or credential IDs change.
+2. Add a **Username with password** credential with ID `dockerhub-creds`, as expected by `Dockerizer.login()`. The account must be able to push `sm1986/playlist-frontend` and `sm1986/playlist-backend`. Update the image prefix in the Jenkinsfile if publishing to another namespace.
+3. Create a **Pipeline** job using **Pipeline script from SCM**, point it at this repository, select the branch containing your changes (currently `dev`), and set the script path to `Jenkinsfile`.
+4. Provide a separate MariaDB test database reachable from the build agents. The defaults in [`backend/phpunit.xml`](../../backend/phpunit.xml) are host `database`, port `3306`, database `playlist_test`, username `playlist`, and password `password`. Set the `DB_*` environment variables on the build agent to override these defaults. Initialize the `playlists` table using the definition in [`database/playlistDB.sql`](../../database/playlistDB.sql), adapting its `CREATE DATABASE` and `USE` statements to `playlist_test`. The tests delete playlist records, so use a dedicated test database. This bootstrap installs Jenkins only; it does not create the database or a Service named `database`.
+
+Commit and push changes, then select **Build Now** to load the Jenkinsfile from SCM. **Replay** reuses the earlier build's pipeline script and can continue running outdated code even when checkout retrieves a newer commit.
 
 The existing pipeline uses a privileged Docker-in-Docker build container, so the namespace must permit privileged build pods. The bootstrap does not grant cluster-admin permissions or change namespace policies.
+
+### Pipeline stages and PHP setup
+
+The PHP build container uses `php:8.5-cli-alpine` to match the application's PHP minor version. After checkout, [`infra/php/prepare-php.sh`](../php/prepare-php.sh) runs from the repository root inside that container. It installs Composer with SHA-384 installer signature verification, missing PHP extensions including `pdo_mysql`, PCOV for coverage and mutation testing, and supporting tools. It also sets PHP's memory limit to 512 MiB for static analysis. It is an Alpine container setup script, not a host setup command.
+
+The pipeline installs backend dependencies from `composer.lock`, prepares separate Checkov and Semgrep virtual environments, and waits for the Docker daemon. The build pod needs outbound access to Alpine repositories, PECL, Composer and package sources, PyPI, scan rule sources, and container registries.
+
+PHP CS Fixer, PHP_CodeSniffer, and PHPStan run in parallel. Security checks run Composer Audit, Semgrep for PHP and Dockerfiles, and Checkov for the three service Dockerfiles. The pipeline does not scan Compose YAML with Checkov's Dockerfile framework.
+
+PHPUnit and Infection run sequentially because they share the workspace and test database. PHPUnit writes its JUnit report to `backend/phpunit-results.xml`, keeping `backend/phpunit.xml` as the configuration file. Test results, coverage, mutation reports, and scanner reports are archived before cleanup.
+
+The pipeline builds and scans the frontend and backend images before logging in, tagging, and pushing them. The current Jenkinsfile publishes version `1.0.0` for environment `dev`; change its variables when preparing another release. The database Dockerfile is scanned but its image is not built or published by this pipeline.
+
+Cleanup runs in a `finally` block after successful or failed stages. It makes build directories writable by the inbound agent before deleting the workspace, including directories created by root in build containers. Generated PHPStan, Infection, and formatter cache files are ignored by Git.
 
 ## Troubleshooting
 

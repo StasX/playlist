@@ -11,7 +11,7 @@ RUN composer install \
 COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative
 
-FROM php:8.3-fpm-alpine3.24
+FROM php:8.5-fpm-alpine3.24
 
 RUN apk add --no-cache $PHPIZE_DEPS \
     && docker-php-ext-install pdo_mysql \

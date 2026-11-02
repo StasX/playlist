@@ -1,18 +1,19 @@
 <?php
+
 use Illuminate\Database\Capsule\Manager as Capsule;
 
 $capsule = new Capsule();
 
 $capsule->addConnection([
-    'driver'    => 'mysql',
-    'host'      => getenv('DB_HOST') ?: 'localhost',
-    'port'      => ((int) getenv('DB_PORT') ?: 3306),
-    'database'  => getenv('DB_DATABASE') ?: 'playlist',
-    'username'  => getenv('DB_USERNAME') ?: 'root',
-    'password'  => getenv('DB_PASSWORD'),
-    'charset'   => getenv('DB_CHARSET'),
+    'driver' => 'mysql',
+    'host' => getenv('DB_HOST') !== false && getenv('DB_HOST') !== '' ? getenv('DB_HOST') : 'localhost',
+    'port' => (int) getenv('DB_PORT') !== 0 ? (int) getenv('DB_PORT') : 3306,
+    'database' => getenv('DB_DATABASE') !== false && getenv('DB_DATABASE') !== '' ? getenv('DB_DATABASE') : 'playlist',
+    'username' => getenv('DB_USERNAME') !== false && getenv('DB_USERNAME') !== '' ? getenv('DB_USERNAME') : 'root',
+    'password' => getenv('DB_PASSWORD'),
+    'charset' => getenv('DB_CHARSET'),
     'collation' => getenv('DB_COLLATION'),
-    'prefix'    => '',
+    'prefix' => '',
 ]);
 // Makes Capsule available globally via static methods:
 $capsule->setAsGlobal();

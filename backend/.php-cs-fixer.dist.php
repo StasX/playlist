@@ -28,7 +28,7 @@ return (new Config())
     ->setFinder($finder)
     ->setRules([
         '@PSR12' => true,
-        '@PHP83Migration' => true,
+        '@PHP8x5Migration' => true,
 
         // Arrays
         'array_indentation' => true,

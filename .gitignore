@@ -1,6 +1,10 @@
 node_modules/
 vendor/
 backend/.phpunit.cache/
+backend/storage/phpstan/
+backend/storage/.php-cs-fixer.cache
+backend/storage/infection/
+backend/storage/logs/
 backend/public/fonts/
 backend/public/assets/
 backend/public/js/

@@ -35,6 +35,8 @@ See [infra/jenkins/README.md](infra/jenkins/README.md) for the Helm bootstrap, p
 
 ## Local development
 
+Use PHP 8.5 and Composer 2, matching the backend image and Jenkins build container.
+
 Install backend dependencies, export the database variables from `.env.example` into the PHP process environment, and provide a MariaDB database initialized with `database/playlistDB.sql`. PHP reads environment variables directly; it does not load `.env` automatically.
 
 Start the API in one terminal:

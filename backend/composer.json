@@ -1,5 +1,6 @@
 {
     "require": {
+        "php": "^8.5",
         "slim/slim": "^4.15",
         "slim/psr7": "^1.8",
         "psr/log": "^3.0",
@@ -22,7 +23,7 @@
     "config": {
         "sort-packages": true,
         "platform": {
-            "php": "8.3.0"
+            "php": "8.5.0"
         },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
@@ -34,12 +35,12 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "infection/infection": "^0.34.0",
         "larastan/larastan": "^3.10",
-        "phpcsstandards/php_codesniffer": "^4.0",
         "phpstan/phpstan": "^2.2",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.5",
-        "slevomat/coding-standard": "^8.31"
+        "slevomat/coding-standard": "^8.31",
+        "squizlabs/php_codesniffer": "^4.0.2"
     },
     "scripts": {
         "test": "phpunit",
