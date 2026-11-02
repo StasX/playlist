@@ -11,6 +11,7 @@ function appendRow(popup, songsData, confirmBtn) {
     const songUrl = popup.find("#songs-form .row:last-child .song-url");
     songName.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
     songUrl.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
+    validateSongsForm(popup, songsData, confirmBtn);
 }
 
 function addSongs(initialSongs = []) {
