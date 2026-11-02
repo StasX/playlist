@@ -13,7 +13,8 @@ RUN composer dump-autoload --optimize --classmap-authoritative
 
 FROM php:8.5-fpm-alpine3.24
 
-RUN apk add --no-cache fcgi \
+RUN apk upgrade --no-cache \
+    && apk add --no-cache fcgi \
     && apk add --no-cache $PHPIZE_DEPS \
     && docker-php-ext-install pdo_mysql \
     && apk del $PHPIZE_DEPS
