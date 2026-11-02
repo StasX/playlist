@@ -25,7 +25,7 @@ final class ErrorDetailsTest extends HttpTestCase
         try {
             putenv($environment === null ? 'APP_ENV' : 'APP_ENV=' . $environment);
             $this->app = require dirname(__DIR__, 2) . '/bootstrap/config.php';
-            $this->app->get('/api/test-error', static function (): never {
+            $this->app->get('/api/test-error', function (): never {
                 throw new \RuntimeException('Sensitive database password and internal path');
             });
 
