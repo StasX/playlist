@@ -148,8 +148,7 @@ podTemplate(cloud: 'kubernetes', containers: [
             }
             stage('Trivy Scan') {
                 container('docker') {
-                    // Resolve the uppercase shared-library global as a script instance.
-                    def dockerSecurityScans = getProperty('DockerSecurityScans')
+                    def dockerSecurityScans = this.DockerSecurityScans
                     services.each { service ->
                         dir("reports/trivy-${service}") {
                             dockerSecurityScans.trivyScanImage("${image}-${service}", imageTag)
