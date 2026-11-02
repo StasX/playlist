@@ -62,25 +62,34 @@ function createModal(playlist) {
                 });
             }
             function play() {
+                if (closed || !urls[current]) return;
                 const pending = media.play();
                 if (pending) pending.catch(() => {
                     if (!closed) { heading.text("Playback could not start. Press play to retry."); render(); }
                 });
             }
             function select(index) {
-                if (closed || !urls[index]) return;
+                if (closed || index < 0 || index >= songs.length) return;
                 media.pause();
                 current = index;
+                remove.prop("disabled", false);
+                popup.find("#play-pause").prop("disabled", !urls[index]);
+                if (!urls[index]) {
+                    audio.removeAttr("src");
+                    media.load();
+                    heading.text(`Cannot play: ${songs[index].name}. You can delete this song or edit its URL.`);
+                    $("title").text(originalTitle);
+                    render(); progress();
+                    return;
+                }
                 audio.attr("src", urls[index]);
                 media.load();
                 heading.text(`Now playing: ${songs[index].name}`);
                 $("title").text(`Playing: ${songs[index].name}`);
-                remove.prop("disabled", false);
                 render(); progress(); play();
             }
             $.each(songs, (index, song) => {
-                const row = $("<li>").text(song.name).attr("tabindex", urls[index] ? "0" : "-1")
-                    .attr("aria-disabled", urls[index] ? "false" : "true")
+                const row = $("<li>").text(song.name).attr("tabindex", "0")
                     .on("click", () => select(index))
                     .on("keydown", event => {
                         if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(index); }

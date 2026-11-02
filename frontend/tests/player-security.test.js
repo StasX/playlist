@@ -88,8 +88,17 @@ test('song payloads remain text and unsafe URLs are never played', () => {
     const rows = h.selections.get('ol').children;
     for (const event of ['play', 'pause']) { h.audio.events[event](); assert.equal(rows[0].value, name); }
     rows[1].events.click();
+    assert.equal(h.audio.attributes.src, undefined);
+    assert.equal(h.audio[0].paused, true);
+    assert.equal(rows[1].attributes['aria-current'], 'true');
+    assert.equal(rows[1].attributes.tabindex, '0');
+    assert.equal(h.selections.get('#remove-song').disabled, false);
+    assert.equal(h.selections.get('#play-pause').disabled, true);
+    h.selections.get('#audio-play-pause').events.click();
+    assert.equal(h.audio[0].paused, true);
+    rows[0].events.click();
     assert.equal(h.audio.attributes.src, 'https://example.com/song.mp3');
-    assert.equal(rows[1].attributes['aria-disabled'], 'true');
+    assert.equal(h.selections.get('#play-pause').disabled, false);
 });
 
 test('empty playlists do not crash and disable playback', () => {
@@ -133,4 +142,18 @@ test('failed saves preserve playlist and store data', () => {
     assert.equal(h.playlist.songs[0].name, 'one');
     assert.equal(h.storeUpdates.length, 0);
     assert.equal(h.dialogs.at(-1).icon, 'error');
+});
+
+test('an invalid stored song can be selected with the keyboard and deleted', async () => {
+    const h = harness([{ name: 'Broken', url: 'not a URL' }], true);
+    h.selections.get('ol').children[0].events.keydown({ key: 'Enter', preventDefault() {} });
+    assert.equal(h.selections.get('#remove-song').disabled, false);
+    assert.equal(h.audio.attributes.src, undefined);
+    assert.equal(h.audio[0].paused, true);
+    h.selections.get('#remove-song').events.click();
+    await Promise.resolve();
+    assert.equal(h.requests[0].data.songs.length, 0);
+    h.requests[0].success();
+    assert.equal(h.playlist.songs.length, 0);
+    assert.equal(h.storeUpdates[0].songs.length, 0);
 });
