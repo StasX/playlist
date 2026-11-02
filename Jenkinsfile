@@ -122,13 +122,14 @@ podTemplate(cloud: 'kubernetes', containers: [
             }
             // Both suites use the same database and workspace, so run them sequentially.
             stage('PHPUnit and Infection Tests') {
-                container('composer') {
-                    dir('backend') {
-                        try {
-                            // The shared helper overwrites phpunit.xml with its JUnit report.
-                            sh 'vendor/bin/phpunit --configuration phpunit.xml --log-junit phpunit-results.xml --coverage-clover coverage.xml'
-                            sh 'vendor/bin/infection --configuration=infection.json5 --threads=1 --no-progress'
-                        } finally {
+                container('docker') {
+                    try {
+                        timeout(time: 20, unit: 'MINUTES') {
+                            sh 'docker compose -f docker-compose.dev.yml run --build --rm tests'
+                        }
+                    } finally {
+                        sh(returnStatus: true, script: 'docker compose -f docker-compose.dev.yml down')
+                        dir('backend') {
                             junit(testResults: 'phpunit-results.xml', allowEmptyResults: true)
                             archiveArtifacts(
                                 artifacts: 'phpunit-results.xml,coverage.xml,storage/logs/infection*',
@@ -154,14 +155,30 @@ podTemplate(cloud: 'kubernetes', containers: [
                     }
                 }
             }
-            stage('Publish Docker Images') {
-                container('docker') {
-                    Dockerizer.login()
-                    services.each { service ->
-                        Dockerizer.tag("${image}-${service}", version, envName)
-                        Dockerizer.push("${image}-${service}", version, envName)
+            def publishImages = false
+            stage('Approve Docker Image Publishing') {
+                publishImages = input(
+                    message: "Publish ${image}-frontend:${imageTag} and ${image}-backend:${imageTag} to Docker Hub?",
+                    ok: 'Continue',
+                    parameters: [booleanParam(
+                        name: 'PUBLISH_IMAGES',
+                        defaultValue: false,
+                        description: 'Check to publish both Docker images. Leave unchecked to skip publishing.'
+                    )]
+                )
+            }
+            if (publishImages) {
+                stage('Publish Docker Images') {
+                    container('docker') {
+                        Dockerizer.login()
+                        services.each { service ->
+                            Dockerizer.tag("${image}-${service}", version, envName)
+                            Dockerizer.push("${image}-${service}", version, envName)
+                        }
                     }
                 }
+            } else {
+                echo 'Docker image publishing skipped.'
             }
         } finally {
             stage('Cleanup Workspace') {

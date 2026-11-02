@@ -1,6 +1,8 @@
 node_modules/
 vendor/
 backend/.phpunit.cache/
+backend/phpunit-results.xml
+backend/coverage.xml
 backend/storage/phpstan/
 backend/storage/.php-cs-fixer.cache
 backend/storage/infection/

@@ -59,4 +59,14 @@ npm run start-dev
 
 The development server serves the frontend at http://localhost:8000, rebuilds on changes, and proxies `/api` to the local API on port 8001. `npm run build` produces the static production build; Docker uses Nginx to serve it.
 
-Run PHP checks from `backend/`, for example `composer test` and `composer phpstan`. The route tests require a separate test database configured by `backend/phpunit.xml`; existing API/test inconsistencies still need to be resolved.
+Run PHPUnit and Infection with an isolated MariaDB test database from the repository root:
+
+```sh
+docker compose -f docker-compose.dev.yml run --build --rm tests
+```
+
+Compose waits for the database health check, then the runner installs locked Composer dependencies and runs PHPUnit with coverage followed by Infection with one worker. Run either suite separately by appending `unit` or `infection` to the command. Reports are written to `backend/phpunit-results.xml`, `backend/coverage.xml`, and `backend/storage/logs/infection*`. Infection's temporary files live in container memory to avoid filesystem errors on Windows bind mounts.
+
+Stop the test database with `docker compose -f docker-compose.dev.yml down`. Its data lives in memory and is discarded when the database container stops. Composer dependencies use a separate named volume. The test stack publishes no ports and uses its own Compose project, separate from the application stack. Run one test command at a time because both suites delete playlist records.
+
+For other PHP checks, run commands from `backend/`, for example `composer phpstan`.
