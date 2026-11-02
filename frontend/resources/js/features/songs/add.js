@@ -13,12 +13,12 @@ function appendRow(popup, songsData, confirmBtn) {
     songUrl.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
 }
 
-function addSongs() {
+function addSongs(initialSongs = []) {
     const songsData = { songs: [] };
     return {
         songsData,
         cb: Swal.fire({
-            title: "Add songs to playlist",
+            title: initialSongs.length ? "Edit playlist songs" : "Add songs to playlist",
             html: html,
             showCancelButton: true,
             confirmButtonColor: "#ff4500",
@@ -28,6 +28,13 @@ function addSongs() {
             didOpen: () => {
                 const popup = $(Swal.getPopup());
                 const confirmBtn = $(Swal.getConfirmButton());
+
+                $.each(initialSongs, (index, song) => {
+                    if (index > 0) appendRow(popup, songsData, confirmBtn);
+                    const songRow = popup.find("#songs-form .row").eq(index);
+                    songRow.find(".song-name").val(song.name);
+                    songRow.find(".song-url").val(song.url);
+                });
 
                 const songName = popup.find(".song-name");
                 const songUrl = popup.find(".song-url");
