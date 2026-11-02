@@ -43,6 +43,8 @@ podTemplate(cloud: 'kubernetes', containers: [
                     },
                     'Wait for Docker': {
                         container('docker') {
+                            // The shared-library Trivy helper uses a Bash shebang.
+                            sh 'apk add --no-cache bash'
                             timeout(time: 2, unit: 'MINUTES') {
                                 sh 'until docker info >/dev/null 2>&1; do sleep 2; done'
                             }
