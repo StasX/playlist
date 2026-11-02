@@ -21,6 +21,8 @@ docker compose up --build
 
 Open http://localhost:8090.
 
+The containers run as `nginx`, `www-data`, and `mysql`, respectively. Nginx listens on container port 80, mapped to host port 8090. Docker health checks probe Nginx at `/healthz`, PHP-FPM through its FastCGI ping endpoint, and MariaDB using its bundled health-check script.
+
 Nginx serves the frontend build at `/` and forwards `/api/` requests to PHP-FPM. For example, `GET /api/playlist` lists playlists. Missing static files return 404, and PHP scripts cannot be requested directly.
 
 Nginx and PHP share `web-network`. PHP and MariaDB share the private, internal `app-network`, using `database:3306` for database connections. Only Nginx publishes a host port; neither PHP-FPM nor MariaDB is exposed to the host.
