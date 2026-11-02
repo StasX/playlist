@@ -14,6 +14,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         envVars: [envVar(key: 'DOCKER_TLS_CERTDIR', value: '')]
     ),
     containerTemplate(name: 'composer', image: 'php:8.5-cli-alpine', command: 'sleep', args: '1d'),
+    containerTemplate(name: 'node', image: 'node:26.5.0-alpine', command: 'sleep', args: '1d'),
     containerTemplate(name: 'checkov', image: 'python:3.13', command: 'sleep', args: '1d'),
     containerTemplate(name: 'semgrep', image: 'python:3.13', command: 'sleep', args: '1d')
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
@@ -51,6 +52,14 @@ podTemplate(cloud: 'kubernetes', containers: [
                         }
                     }
                 )
+            }
+            stage('Frontend Tests') {
+                container('node') {
+                    dir('frontend') {
+                        sh 'npm ci'
+                        sh 'npm test'
+                    }
+                }
             }
             stage('Code Quality') {
                 parallel(

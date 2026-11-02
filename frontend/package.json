@@ -14,7 +14,7 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test tests/*.test.js",
     "build": "webpack --mode production --config webpack.config.prod.js",
     "dev": "webpack --mode development --watch --progress --color --config webpack.config.dev.js",
     "start-dev": "webpack serve --mode development --config webpack.config.dev.js",

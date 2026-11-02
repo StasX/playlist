@@ -61,6 +61,8 @@ npm run start-dev
 
 The development server serves the frontend at http://localhost:8000, rebuilds on changes, and proxies `/api` to the local API on port 8001. `npm run build` produces the static production build; Docker uses Nginx to serve it.
 
+Run frontend tests from `frontend/` with `npm test`. Jenkins installs locked frontend dependencies with `npm ci` and runs this suite before the PHP quality checks and Docker image builds.
+
 Run PHPUnit and Infection with an isolated MariaDB test database from the repository root:
 
 ```sh
