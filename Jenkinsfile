@@ -142,7 +142,7 @@ podTemplate(cloud: 'kubernetes', containers: [
             stage('Build Docker Images') {
                 container('docker') {
                     services.each { service ->
-                        dir(service) { Dockerizer.buildImage("${image}-${service}", version, envName) }
+                        dir(service) { dockerizer.buildImage("${image}-${service}", version, envName) }
                     }
                 }
             }
@@ -170,10 +170,10 @@ podTemplate(cloud: 'kubernetes', containers: [
             if (publishImages) {
                 stage('Publish Docker Images') {
                     container('docker') {
-                        Dockerizer.login()
+                        dockerizer.login()
                         services.each { service ->
-                            Dockerizer.tag("${image}-${service}", version, envName)
-                            Dockerizer.push("${image}-${service}", version, envName)
+                            dockerizer.tag("${image}-${service}", version, envName)
+                            dockerizer.push("${image}-${service}", version, envName)
                         }
                     }
                 }
