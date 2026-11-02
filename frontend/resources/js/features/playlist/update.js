@@ -31,9 +31,9 @@ function updatePlaylist(element) {
             confirmBtn.prop("disabled", true);
             name.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
             imgUrl.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
-            validatePlaylistForm(name, imgUrl, playlist, confirmBtn);
             name.val(playlist.name);
             imgUrl.val(playlist.image);
+            validatePlaylistForm(name, imgUrl, playlist, confirmBtn);
             const imgContainer = popup.find(".image-container");
             const img = imgContainer.find("img");
             imgContainer.css("display", "block");
