@@ -4,11 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function harness() {
+function harness(initialName = 'Playlist', initialUrl = 'https://example.com/cover.png') {
     const requests = [];
-    const field = value => ({ value, events: {}, val() { return this.value; }, on(event, callback) { this.events[event] = callback; return this; } });
-    const name = field('Playlist');
-    const url = field('https://example.com/cover.png');
+    const field = value => ({ value, events: {}, state: {}, data(key, value) { if (value !== undefined) this.state[key] = value; return this.state[key]; }, val() { return this.value; }, toggleClass(key, enabled) { this[key] = enabled; }, on(event, callback) { this.events[event] = callback; return this; } });
+    const name = field(initialName);
+    const url = field(initialUrl);
     const button = { prop(key, value) { this[key] = value; } };
     const image = Object.assign(field(''), {
         off() { this.events = {}; return this; },
@@ -29,10 +29,25 @@ function harness() {
     return { requests, name, url, button, image, container };
 }
 
+test('empty untouched fields stay neutral, while edited empty fields are invalid', () => {
+    const h = harness('', '');
+    assert.equal(h.name['is-invalid'], false);
+    assert.equal(h.url['is-invalid'], false);
+    assert.equal(h.button.disabled, true);
+    h.name.events.input();
+    assert.equal(h.name['is-invalid'], true);
+    assert.equal(h.url['is-invalid'], false);
+    h.url.events.input();
+    assert.equal(h.url['is-invalid'], true);
+    assert.equal(h.requests.length, 0);
+});
+
 test('preview and confirmation wait for GET success and image load', () => {
     const h = harness();
     assert.equal(h.button.disabled, true);
     assert.equal(h.container.visible, false);
+    assert.equal(h.url['is-invalid'], true);
+    assert.equal(h.name['is-invalid'], false);
     h.name.events.input();
     assert.equal(h.button.disabled, true);
     h.requests[0].success();
@@ -40,9 +55,11 @@ test('preview and confirmation wait for GET success and image load', () => {
     h.image.events.load();
     assert.equal(h.container.visible, true);
     assert.equal(h.button.disabled, false);
+    assert.equal(h.url['is-invalid'], false);
     h.image.events.error();
     assert.equal(h.container.visible, false);
     assert.equal(h.button.disabled, true);
+    assert.equal(h.url['is-invalid'], true);
 });
 
 test('changing the URL cancels requests and ignores stale success responses', () => {

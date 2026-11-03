@@ -36,8 +36,14 @@ function setupImagePreview(popup, imgUrl, name, playlist, confirmBtn) {
         }
     };
 
-    name.on("input", validate);
-    imgUrl.on("input", updatePreview);
+    name.on("input", () => {
+        name.data("edited", true);
+        validate();
+    });
+    imgUrl.on("input", () => {
+        imgUrl.data("edited", true);
+        updatePreview();
+    });
     updatePreview();
 }
 

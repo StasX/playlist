@@ -3,19 +3,22 @@ const Swal = require('sweetalert2');
 const html = require("../../../views/modals/songs.html");
 const row = require("../../../views/modals/songsRow.html");
 const { validateSongsForm } = require("../../utils/validators/songsForm");
+const { createUrlChecks } = require("./urlChecks");
 
+function updateForm(popup, songsData, confirmBtn, checks) {
+    const isValid = validateSongsForm(popup, songsData, confirmBtn, url => checks.isVerified(url));
+    popup.find("#add-song").prop("disabled", !isValid);
+    return isValid;
+}
 
-function appendRow(popup, songsData, confirmBtn) {
+function appendRow(popup, songsData, confirmBtn, checks) {
     $("#songs-form").append(row);
-    const songName = popup.find("#songs-form .row:last-child .song-name");
-    const songUrl = popup.find("#songs-form .row:last-child .song-url");
-    songName.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
-    songUrl.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
-    validateSongsForm(popup, songsData, confirmBtn);
+    updateForm(popup, songsData, confirmBtn, checks);
 }
 
 function addSongs(initialSongs = []) {
     const songsData = { songs: [] };
+    let checks;
     return {
         songsData,
         cb: Swal.fire({
@@ -29,24 +32,30 @@ function addSongs(initialSongs = []) {
             didOpen: () => {
                 const popup = $(Swal.getPopup());
                 const confirmBtn = $(Swal.getConfirmButton());
+                checks = createUrlChecks(() => updateForm(popup, songsData, confirmBtn, checks));
 
                 $.each(initialSongs, (index, song) => {
-                    if (index > 0) appendRow(popup, songsData, confirmBtn);
+                    if (index > 0) appendRow(popup, songsData, confirmBtn, checks);
                     const songRow = popup.find("#songs-form .row").eq(index);
                     songRow.find(".song-name").val(song.name);
                     songRow.find(".song-url").val(song.url);
                 });
 
-                const songName = popup.find(".song-name");
-                const songUrl = popup.find(".song-url");
-                popup.find("#add-song").click(() => appendRow(popup, songsData, confirmBtn));
+                popup.find("#add-song").click(() => {
+                    if (updateForm(popup, songsData, confirmBtn, checks)) {
+                        appendRow(popup, songsData, confirmBtn, checks);
+                    }
+                });
 
                 confirmBtn.prop("disabled", true);
-                songName.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
-                songUrl.on("input", () => validateSongsForm(popup, songsData, confirmBtn));
-                validateSongsForm(popup, songsData,confirmBtn);
+                popup.on("input", "#songs-form .song-name, #songs-form .song-url", event => {
+                    $(event.currentTarget).data("edited", true);
+                    updateForm(popup, songsData, confirmBtn, checks);
+                });
+                updateForm(popup, songsData, confirmBtn, checks);
 
-            }
+            },
+            willClose: () => checks?.dispose()
         })
     };
 }
