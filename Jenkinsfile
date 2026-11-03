@@ -53,16 +53,16 @@ podTemplate(cloud: 'kubernetes', containers: [
                     }
                 )
             }
-            stage('Frontend Tests') {
-                container('node') {
-                    dir('frontend') {
-                        sh 'npm ci'
-                        sh 'npm test'
-                    }
-                }
-            }
             stage('Code Quality') {
                 parallel(
+                    'Frontend Tests': {
+                        container('node') {
+                            dir('frontend') {
+                                sh 'npm ci'
+                                sh 'npm test'
+                            }
+                        }
+                    },
                     'PHP CS Fixer': {
                         container('composer') {
                             dir('backend') { phpCodeQuality.phpCSFixerTesting() }
@@ -131,31 +131,35 @@ podTemplate(cloud: 'kubernetes', containers: [
                     }
                 )
             }
-            // Both suites use the same database and workspace, so run them sequentially.
-            stage('PHPUnit and Infection Tests') {
-                container('docker') {
-                    try {
-                        timeout(time: 20, unit: 'MINUTES') {
-                            sh 'docker compose -f docker-compose.dev.yml run --build --rm tests'
+            stage('Tests and Docker Builds') {
+                parallel(
+                    'PHPUnit and Infection Tests': {
+                        // Both suites share a test database, so keep them sequential.
+                        container('docker') {
+                            try {
+                                timeout(time: 20, unit: 'MINUTES') {
+                                    sh 'docker compose -f docker-compose.dev.yml run --build --rm tests'
+                                }
+                            } finally {
+                                sh(returnStatus: true, script: 'docker compose -f docker-compose.dev.yml down')
+                                dir('backend') {
+                                    junit(testResults: 'phpunit-results.xml', allowEmptyResults: true)
+                                    archiveArtifacts(
+                                        artifacts: 'phpunit-results.xml,coverage.xml,storage/logs/infection*',
+                                        allowEmptyArchive: true
+                                    )
+                                }
+                            }
                         }
-                    } finally {
-                        sh(returnStatus: true, script: 'docker compose -f docker-compose.dev.yml down')
-                        dir('backend') {
-                            junit(testResults: 'phpunit-results.xml', allowEmptyResults: true)
-                            archiveArtifacts(
-                                artifacts: 'phpunit-results.xml,coverage.xml,storage/logs/infection*',
-                                allowEmptyArchive: true
-                            )
+                    },
+                    'Build Docker Images': {
+                        container('docker') {
+                            services.each { service ->
+                                dir(service) { dockerizer.buildImage("${image}-${service}", version, envName) }
+                            }
                         }
                     }
-                }
-            }
-            stage('Build Docker Images') {
-                container('docker') {
-                    services.each { service ->
-                        dir(service) { dockerizer.buildImage("${image}-${service}", version, envName) }
-                    }
-                }
+                )
             }
             stage('Trivy Scan') {
                 container('docker') {
