@@ -160,9 +160,10 @@ test('removing the last song shows a message and preserves playback', async () =
     assert.equal(h.playlist.songs.length, 1);
     assert.equal(h.storeUpdates.length, 0);
     assert.equal(h.audio[0].paused, false);
-    assert.equal(h.overlays.length, 0);
-    assert.match(h.selections.get('#player-message').value, /At least one song/);
-    assert.equal(h.selections.get('#player-message').hidden, false);
+    assert.equal(h.overlays.length, 1);
+    assert.equal(h.overlays[0].title, 'Cannot remove the last song');
+    assert.match(h.overlays[0].text, /At least one song/);
+    assert.equal(h.overlays[0].showCancelButton, false);
     assert.equal(h.dialogs.length, 1);
 });
 

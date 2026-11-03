@@ -148,7 +148,6 @@ function createModal(playlist) {
                     if (keepPlayer && !closed) {
                         const previousUrl = urls[current];
                         songs = updatedSongs;
-                        popup.find("#player-message").text("").prop("hidden", true);
                         updateUrls();
                         updateRows();
                         current = previousUrl ? urls.indexOf(previousUrl) : -1;
@@ -183,9 +182,12 @@ function createModal(playlist) {
             remove.prop("disabled", true).on("click", () => {
                 if (current < 0) return;
                 if (songs.length <= 1) {
-                    popup.find("#player-message")
-                        .text("At least one song must remain in the playlist.")
-                        .prop("hidden", false);
+                    createEditorDialog().fire({
+                        title: "Cannot remove the last song",
+                        text: "At least one song must remain in the playlist.",
+                        confirmButtonText: "OK",
+                        showCancelButton: false,
+                    });
                     return;
                 }
                 const selected = current;
