@@ -16,7 +16,7 @@ const context = {
 };
 vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../resources/js/utils/validators/songsForm.js'), 'utf8'), context);
 const { validateSongsForm } = context.exports;
-const field = value => ({ val: () => value });
+const field = value => ({ val: () => value, data() {}, toggleClass(key, enabled) { this[key] = enabled; } });
 const button = () => ({ prop(key, value) { this[key] = value; } });
 
 const validUrls = [

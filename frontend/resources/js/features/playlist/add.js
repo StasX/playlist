@@ -4,10 +4,10 @@ const html = require("../../../views/modals/playlist.html");
 const { addSongs } = require("../songs/add");
 const { playlistApi } = require("../../api/playlistApi");
 const { displayPlaylists } = require("../../ui/display");
-const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
 const { success} = require("../../utils/messages/success");
 const {fail} = require("../../utils/messages/fail");
 const {AppStore} = require("../../store/AppStore");
+const { setupImagePreview } = require("./imagePreview");
 
 function addPlaylist(playlists) {
     const playlist = {};
@@ -24,10 +24,7 @@ function addPlaylist(playlists) {
             const confirmBtn = $(Swal.getConfirmButton());
             const name = popup.find("#playlist-name");
             const imgUrl = popup.find("#playlist-image");
-            confirmBtn.prop("disabled", true);
-            name.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
-            imgUrl.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
-            validatePlaylistForm(name, imgUrl, playlist, confirmBtn);
+            setupImagePreview(popup, imgUrl, name, playlist, confirmBtn);
         }
     }).then((result) => {
         if (result.isConfirmed) {

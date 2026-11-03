@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { createHash } = require("crypto");
 
 // Generate the static entry page using the filenames produced by either build.
 class StaticSitePlugin {
@@ -16,7 +17,11 @@ class StaticSitePlugin {
                     ? `<link rel="stylesheet" href="/${file}">`
                     : file.endsWith(".js") ? `<script defer src="/${file}"></script>` : ""
                 ).join("\n");
-                const html = fs.readFileSync(templatePath, "utf8").replace("<!-- assets -->", tags);
+                const favicon = fs.readFileSync(path.join(__dirname, "public/favicon.ico"));
+                const faviconVersion = createHash("sha256").update(favicon).digest("hex").slice(0, 8);
+                const html = fs.readFileSync(templatePath, "utf8")
+                    .replace("<!-- assets -->", tags)
+                    .replace('href="/favicon.ico"', `href="/favicon.ico?v=${faviconVersion}"`);
                 compilation.emitAsset("index.html", new compiler.webpack.sources.RawSource(html));
                 for (const name of ["favicon.ico", "robots.txt"]) {
                     const sourcePath = path.join(__dirname, "public", name);

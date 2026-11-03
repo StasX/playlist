@@ -1,4 +1,4 @@
-# Loadable configuration derived from jenkins.export.yaml.
+# Jenkins Configuration as Code loaded by the bootstrap scripts.
 # Admin credentials are resolved from the Helm chart Secret at runtime.
 # This file owns the controller configuration; chart JCasC defaults are disabled.
 ---

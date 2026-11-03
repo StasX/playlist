@@ -12,6 +12,13 @@
     &:active {
         background-color: variables.$active-orange !important;
     }
+
+    &:disabled {
+        background-color: variables.$primary-orange !important;
+        color: variables.$white !important;
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
 }
 
 .btn-link {

@@ -7,6 +7,11 @@
 @use "./partials/cards";
 @use "./partials/side-buttons";
 
+body > #main-container {
+    width: 100%;
+    max-width: none;
+}
+
 body,
 html {
     height: 100%;

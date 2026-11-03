@@ -4,7 +4,7 @@ const { fail } = require("../../utils/messages/fail");
 const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
 const html = require("../../../views/modals/playlist.html");
-const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
+const { setupImagePreview } = require("./imagePreview");
 
 
 
@@ -28,16 +28,9 @@ function updatePlaylist(element) {
             const confirmBtn = $(Swal.getConfirmButton());
             const name = popup.find("#playlist-name");
             const imgUrl = popup.find("#playlist-image");
-            confirmBtn.prop("disabled", true);
-            name.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
-            imgUrl.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
             name.val(playlist.name);
             imgUrl.val(playlist.image);
-            validatePlaylistForm(name, imgUrl, playlist, confirmBtn);
-            const imgContainer = popup.find(".image-container");
-            const img = imgContainer.find("img");
-            imgContainer.css("display", "block");
-            img.attr("src", playlist.image);
+            setupImagePreview(popup, imgUrl, name, playlist, confirmBtn);
         },
         preConfirm: () => {
             const popup = $(Swal.getPopup());
