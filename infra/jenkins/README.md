@@ -56,15 +56,15 @@ With a custom context, add `--context CONTEXT` to these kubectl commands. Passwo
 
 ## Connect the existing pipeline
 
-### Exported controller configuration
+### Controller configuration
 
-[`casc/jenkins.export.yaml`](casc/jenkins.export.yaml) is a snapshot exported from the live controller on 2026-11-01 using Jenkins Configuration as Code. It includes Kubernetes cloud settings, security settings, and the five configured shared libraries. At export time, `test-suite` was trusted and the other four libraries were untrusted; the snapshot preserves that distinction.
+[`casc/jenkins.yaml`](casc/jenkins.yaml) contains the controller's Kubernetes cloud settings, security settings, and five configured shared libraries. `test-suite` is trusted and the other four libraries are untrusted.
 
-The raw snapshot is retained as a reference. Both bootstrap scripts load [`casc/jenkins.yaml`](casc/jenkins.yaml), a copy with the admin security realm adapted to read `${chart-admin-username}` and `${chart-admin-password}` from the Helm chart's Kubernetes Secret. This preserves password generation on fresh installations and the existing chart-managed password during upgrades. No password is stored in Git. Review future exports for sensitive values before committing them.
+Both bootstrap scripts load this file. Its admin security realm reads `${chart-admin-username}` and `${chart-admin-password}` from the Helm chart's Kubernetes Secret. This preserves password generation on fresh installations and the existing chart-managed password during upgrades. No password is stored in Git. Review future exports for sensitive values before committing them.
 
 `controller.JCasC.defaultConfig` is disabled because the loadable file owns the controller's security realm, authorization, Kubernetes cloud, and other exported settings. Do not enable chart defaults alongside this full configuration: duplicate JCasC keys conflict. Edit the loadable file for future changes; changing chart values such as `cloudName` or `numExecutors` alone will not replace settings owned by that file. Its service names and namespace match this bootstrap's fixed `jenkins` release and namespace.
 
-The raw export and exact Helm-rendered loadable YAML were checked against the running controller's `/configuration-as-code/check` endpoint, which returned HTTP 200 with no issues. Both scripts were also verified in render-only mode. These checks do not reload the running controller. Running either script without its render option installs or upgrades Jenkins and can replace UI-managed settings with the committed configuration.
+The exact Helm-rendered loadable YAML was checked against the running controller's `/configuration-as-code/check` endpoint, which returned HTTP 200 with no issues. Both scripts were also verified in render-only mode. These checks do not reload the running controller. Running either script without its render option installs or upgrades Jenkins and can replace UI-managed settings with the committed configuration.
 
 This is not a complete backup: job definitions, build history, plugin binaries, and external credentials are not included. `plugins.yaml` supplies compatible plugin versions for installation; registry and SCM credentials still need to be supplied separately. When exporting again, review the diff, refresh the plugin inventory as needed, and retain the Secret references in the loadable file's security realm.
 
@@ -95,7 +95,7 @@ PHPUnit and Infection run sequentially through the Compose test runner because t
 
 The pipeline builds and scans the frontend and backend images, then pauses at **Approve Docker Image Publishing**. Check **PUBLISH_IMAGES** and select **Continue** to log in, tag, and push both images to Docker Hub. Leave it unchecked and select **Continue** to finish without publishing; **Abort** cancels the build. The current Jenkinsfile publishes version `1.0.0` for environment `dev`; change its variables when preparing another release. The database Dockerfile is scanned but its image is not built or published by this pipeline.
 
-Cleanup runs in a `finally` block after successful or failed stages. It makes build directories writable by the inbound agent before deleting the workspace, including directories created by root in build containers. Generated PHPStan, Infection, and formatter cache files are ignored by Git.
+Build agents use temporary workspaces that are discarded when their Kubernetes pods are deleted, so the pipeline does not run a separate workspace cleanup stage. The test stage still stops its Compose stack in a `finally` block. Generated PHPStan, Infection, and formatter cache files are ignored by Git.
 
 ## Troubleshooting
 
