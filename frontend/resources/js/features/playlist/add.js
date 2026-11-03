@@ -8,6 +8,7 @@ const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
 const { success} = require("../../utils/messages/success");
 const {fail} = require("../../utils/messages/fail");
 const {AppStore} = require("../../store/AppStore");
+const { setupImagePreview } = require("./imagePreview");
 
 function addPlaylist(playlists) {
     const playlist = {};
@@ -24,6 +25,7 @@ function addPlaylist(playlists) {
             const confirmBtn = $(Swal.getConfirmButton());
             const name = popup.find("#playlist-name");
             const imgUrl = popup.find("#playlist-image");
+            setupImagePreview(popup, imgUrl);
             confirmBtn.prop("disabled", true);
             name.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));
             imgUrl.on("input", () => validatePlaylistForm(name, imgUrl, playlist, confirmBtn));

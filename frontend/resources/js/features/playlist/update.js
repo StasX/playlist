@@ -5,6 +5,7 @@ const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
 const html = require("../../../views/modals/playlist.html");
 const { validatePlaylistForm } = require("../../utils/validators/playlistForm");
+const { setupImagePreview } = require("./imagePreview");
 
 
 
@@ -34,10 +35,7 @@ function updatePlaylist(element) {
             name.val(playlist.name);
             imgUrl.val(playlist.image);
             validatePlaylistForm(name, imgUrl, playlist, confirmBtn);
-            const imgContainer = popup.find(".image-container");
-            const img = imgContainer.find("img");
-            imgContainer.css("display", "block");
-            img.attr("src", playlist.image);
+            setupImagePreview(popup, imgUrl);
         },
         preConfirm: () => {
             const popup = $(Swal.getPopup());
