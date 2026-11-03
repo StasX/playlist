@@ -4,6 +4,7 @@ const html = require("../../../views/modals/songs.html");
 const row = require("../../../views/modals/songsRow.html");
 const { validateSongsForm } = require("../../utils/validators/songsForm");
 const { createUrlChecks } = require("./urlChecks");
+const { createEditorDialog } = require("./editorDialog");
 
 function updateForm(popup, songsData, confirmBtn, checks) {
     const isValid = validateSongsForm(popup, songsData, confirmBtn, url => checks.isVerified(url));
@@ -12,16 +13,17 @@ function updateForm(popup, songsData, confirmBtn, checks) {
 }
 
 function appendRow(popup, songsData, confirmBtn, checks) {
-    $("#songs-form").append(row);
+    popup.find("#songs-form").append(row);
     updateForm(popup, songsData, confirmBtn, checks);
 }
 
-function addSongs(initialSongs = []) {
+function addSongs(initialSongs = [], { overlay = false } = {}) {
+    const modal = overlay ? createEditorDialog() : Swal;
     const songsData = { songs: [] };
     let checks;
     return {
         songsData,
-        cb: Swal.fire({
+        cb: modal.fire({
             title: initialSongs.length ? "Edit playlist songs" : "Add songs to playlist",
             html: html,
             showCancelButton: true,
@@ -30,8 +32,8 @@ function addSongs(initialSongs = []) {
             confirmButtonText: "Save",
             cancelButtonText: "Cancel",
             didOpen: () => {
-                const popup = $(Swal.getPopup());
-                const confirmBtn = $(Swal.getConfirmButton());
+                const popup = $(modal.getPopup());
+                const confirmBtn = $(modal.getConfirmButton());
                 checks = createUrlChecks(() => updateForm(popup, songsData, confirmBtn, checks));
 
                 $.each(initialSongs, (index, song) => {

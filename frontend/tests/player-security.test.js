@@ -10,6 +10,7 @@ function harness(songs, confirmDelete = false) {
     const dialogs = [];
     const requests = [];
     const storeUpdates = [];
+    const overlays = [];
     let editor;
     function $(selector) {
         if (typeof selector === 'string' && selector.startsWith('<')) {
@@ -25,6 +26,7 @@ function harness(songs, confirmDelete = false) {
             html(value) { assert.ok(!value.includes('<img')); this.markup = value; return this; },
             append(child) { assert.equal(typeof child, 'object'); this.children.push(child); return this; },
             prepend(child) { this.children.unshift(child); return this; },
+            empty() { this.children = []; return this; },
             attr(key, value) { this.attributes[key] = value; return this; },
             removeAttr(key) { delete this.attributes[key]; return this; },
             prop(key, value) { this[key] = value; return this; },
@@ -56,15 +58,38 @@ function harness(songs, confirmDelete = false) {
                 requests.push(request); return request;
             } } };
             if (id.endsWith('AppStore')) return { AppStore: { getInstance: () => ({ setSongs: data => storeUpdates.push(data) }) } };
-            if (id.endsWith('songs/add')) return { addSongs(initial) { editor = { initial, songsData: { songs: [] } }; return { ...editor, cb: { then(cb) { editor.finish = cb; } } }; } };
+            if (id.endsWith('songs/add')) return { addSongs(initial, options) { editor = { initial, options, songsData: { songs: [] } }; return { ...editor, cb: { then(cb) { editor.finish = cb; } } }; } };
+            if (id.endsWith('songs/editorDialog')) return { createEditorDialog: () => ({ fire(options) {
+                overlays.push(options);
+                return Promise.resolve({ isConfirmed: confirmDelete });
+            } }) };
             throw new Error(`Unexpected import: ${id}`);
         },
     };
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../resources/js/features/player/modal.js'), 'utf8'), context);
     context.exports.createModal(playlist);
-    return { selections, nodes, dialogs, requests, storeUpdates, playlist, get editor() { return editor; }, audio: nodes.find(n => n.selector === '<audio/>') };
+    return { selections, nodes, dialogs, overlays, requests, storeUpdates, playlist, get editor() { return editor; }, audio: nodes.find(n => n.selector === '<audio/>') };
 }
 const song = name => ({ name, url: `https://example.com/${name}.mp3` });
+
+test('current row icon toggles playback without resetting the track', () => {
+    const h = harness([song('one'), song('two')]);
+    const row = h.selections.get('ol').children[0];
+    h.audio[0].currentTime = 42;
+    let stopped = false;
+    row.children[0].events.click({ stopPropagation() { stopped = true; } });
+    assert.equal(stopped, true);
+    assert.equal(h.audio[0].paused, true);
+    assert.equal(h.audio[0].currentTime, 42);
+    h.audio.events.pause();
+    assert.equal(row.children[0].attributes['aria-label'], 'Play song');
+    row.children[0].events.keydown({ key: 'Enter', preventDefault() {}, stopPropagation() {} });
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.audio[0].currentTime, 42);
+    assert.equal(h.audio.attributes.src, song('one').url);
+    h.audio.events.play();
+    assert.equal(row.children[0].attributes['aria-label'], 'Pause song');
+});
 
 test('selects individual tracks, advances on ended, and stops at the last song', () => {
     const h = harness([song('one'), song('two')]);
@@ -108,10 +133,11 @@ test('empty playlists do not crash and disable playback', () => {
     assert.equal(h.selections.get('#remove-song').disabled, true);
 });
 
-test('edits persist before updating the store and closing stops audio', () => {
+test('editing opens an overlay while audio continues and saves update the existing player', () => {
     const h = harness([song('one')]);
     h.selections.get('#update-songs').events.click();
-    assert.equal(h.audio[0].paused, true);
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.editor.options.overlay, true);
     assert.deepEqual(h.editor.initial, [song('one')]);
     h.editor.songsData.songs = [song('edited')];
     h.editor.finish({ isConfirmed: true });
@@ -120,17 +146,46 @@ test('edits persist before updating the store and closing stops audio', () => {
     h.requests[0].success();
     assert.equal(h.playlist.songs[0].name, 'edited');
     assert.equal(h.storeUpdates[0].songs[0].name, 'edited');
+    assert.equal(h.dialogs.length, 1);
+    assert.equal(h.audio[0].paused, false);
 });
 
-test('deleting the last song saves an empty playlist and updates the store', async () => {
+test('removing the last song shows a message and preserves playback', async () => {
     const h = harness([song('one')], true);
     h.selections.get('#remove-song').events.click();
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.dialogs.length, 1);
     await Promise.resolve();
-    assert.equal(h.requests[0].data.songs.length, 0);
+    assert.equal(h.requests.length, 0);
     assert.equal(h.playlist.songs.length, 1);
+    assert.equal(h.storeUpdates.length, 0);
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.overlays.length, 0);
+    assert.match(h.selections.get('#player-message').value, /At least one song/);
+    assert.equal(h.selections.get('#player-message').hidden, false);
+    assert.equal(h.dialogs.length, 1);
+});
+
+test('canceling song deletion keeps the player and playback position', async () => {
+    const h = harness([song('one'), song('two')]);
+    h.audio[0].currentTime = 42;
+    h.selections.get('#remove-song').events.click();
+    await Promise.resolve();
+    assert.equal(h.requests.length, 0);
+    assert.equal(h.dialogs.length, 1);
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.audio[0].currentTime, 42);
+});
+
+test('deleting the current song selects a remaining track in the same player', async () => {
+    const h = harness([song('one'), song('two')], true);
+    h.selections.get('#remove-song').events.click();
+    await Promise.resolve();
+    assert.equal(h.audio.attributes.src, song('one').url);
     h.requests[0].success();
-    assert.equal(h.playlist.songs.length, 0);
-    assert.equal(h.storeUpdates[0].songs.length, 0);
+    assert.equal(h.audio.attributes.src, song('two').url);
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.dialogs.length, 1);
 });
 
 test('failed saves preserve playlist and store data', () => {
@@ -141,19 +196,45 @@ test('failed saves preserve playlist and store data', () => {
     h.requests[0].failure();
     assert.equal(h.playlist.songs[0].name, 'one');
     assert.equal(h.storeUpdates.length, 0);
-    assert.equal(h.dialogs.at(-1).icon, 'error');
+    assert.match(h.selections.get('h5').value, /could not be saved/);
+    assert.equal(h.dialogs.length, 1);
+    assert.equal(h.audio[0].paused, false);
 });
 
-test('an invalid stored song can be selected with the keyboard and deleted', async () => {
-    const h = harness([{ name: 'Broken', url: 'not a URL' }], true);
+test('canceling edits preserves the playing track and position', () => {
+    const h = harness([song('one')]);
+    h.audio[0].currentTime = 42;
+    h.selections.get('#update-songs').events.click();
+    h.editor.finish({ isConfirmed: false });
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.audio[0].currentTime, 42);
+    assert.equal(h.dialogs.length, 1);
+    assert.equal(h.requests.length, 0);
+});
+
+test('saving a renamed current track preserves playback position', () => {
+    const h = harness([song('one')]);
+    h.audio[0].currentTime = 42;
+    h.selections.get('#update-songs').events.click();
+    h.editor.songsData.songs = [{ ...song('one'), name: 'Renamed' }];
+    h.editor.finish({ isConfirmed: true });
+    h.requests[0].success();
+    assert.equal(h.audio[0].paused, false);
+    assert.equal(h.audio[0].currentTime, 42);
+    assert.equal(h.selections.get('ol').children[0].value, 'Renamed');
+    assert.equal(h.dialogs.length, 1);
+});
+
+test('an invalid stored song can be selected with the keyboard and deleted when another remains', async () => {
+    const h = harness([{ name: 'Broken', url: 'not a URL' }, song('valid')], true);
     h.selections.get('ol').children[0].events.keydown({ key: 'Enter', preventDefault() {} });
     assert.equal(h.selections.get('#remove-song').disabled, false);
     assert.equal(h.audio.attributes.src, undefined);
     assert.equal(h.audio[0].paused, true);
     h.selections.get('#remove-song').events.click();
     await Promise.resolve();
-    assert.equal(h.requests[0].data.songs.length, 0);
+    assert.equal(h.requests[0].data.songs.length, 1);
     h.requests[0].success();
-    assert.equal(h.playlist.songs.length, 0);
-    assert.equal(h.storeUpdates[0].songs.length, 0);
+    assert.equal(h.playlist.songs.length, 1);
+    assert.equal(h.storeUpdates[0].songs.length, 1);
 });

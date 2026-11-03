@@ -4,6 +4,7 @@ const html = require("../../../views/player/player.html");
 const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
 const { addSongs } = require("../songs/add");
+const { createEditorDialog } = require("../songs/editorDialog");
 
 function createModal(playlist) {
     const audio = $("<audio/>");
@@ -20,6 +21,7 @@ function createModal(playlist) {
     }
     return Swal.fire({
         html, showConfirmButton: false, showCloseButton: true, width: 740,
+        allowOutsideClick: false,
         customClass: { popup: "player-popup", htmlContainer: "player-html-container" },
         willClose: cleanup,
         didDestroy: cleanup,
@@ -30,18 +32,22 @@ function createModal(playlist) {
             const list = popup.find("ol");
             const tracker = popup.find("#tracker");
             const volume = popup.find("#vol").val(media.volume);
-            const remove = popup.find("#remove-song").attr("title", "Delete selected song");
+            const remove = popup.find("#remove-song").attr("title", "Delete playing song");
             popup.find("#update-songs").attr("title", "Edit playlist songs");
-            const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
+            let songs = Array.isArray(playlist.songs) ? playlist.songs : [];
             let current = -1;
             const rows = [];
             const urls = [];
-            $.each(songs, (index, song) => {
-                try {
-                    const url = new URL(song.url);
-                    urls[index] = ["http:", "https:"].includes(url.protocol) ? url.href : null;
-                } catch { urls[index] = null; }
-            });
+            function updateUrls() {
+                urls.length = 0;
+                $.each(songs, (index, song) => {
+                    try {
+                        const url = new URL(song.url);
+                        urls[index] = ["http:", "https:"].includes(url.protocol) ? url.href : null;
+                    } catch { urls[index] = null; }
+                });
+            }
+            updateUrls();
             function time(value) {
                 if (!Number.isFinite(value)) return "00:00";
                 return `${Math.floor(value / 60).toString().padStart(2, "0")}:${Math.floor(value % 60).toString().padStart(2, "0")}`;
@@ -58,7 +64,23 @@ function createModal(playlist) {
                 image.toggleClass("rotation", playing);
                 $.each(rows, (index, row) => {
                     row.text(songs[index].name).attr("aria-current", index === current ? "true" : "false");
-                    if (index === current) row.prepend($("<i>").addClass(`${icon} list-playing`));
+                    if (index === current) {
+                        const control = $("<i>").addClass(`${icon} list-playing`)
+                            .attr("role", "button").attr("tabindex", "0")
+                            .attr("aria-label", playing ? "Pause song" : "Play song")
+                            .on("click", event => {
+                                event.stopPropagation();
+                                toggle();
+                            })
+                            .on("keydown", event => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    toggle();
+                                }
+                            });
+                        row.prepend(control);
+                    }
                 });
             }
             function play() {
@@ -88,15 +110,20 @@ function createModal(playlist) {
                 $("title").text(`Playing: ${songs[index].name}`);
                 render(); progress(); play();
             }
-            $.each(songs, (index, song) => {
-                const row = $("<li>").text(song.name).attr("tabindex", "0")
-                    .on("click", () => select(index))
-                    .on("keydown", event => {
-                        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(index); }
-                    });
-                rows.push(row);
-                list.append(row);
-            });
+            function updateRows() {
+                list.empty();
+                rows.length = 0;
+                $.each(songs, (index, song) => {
+                    const row = $("<li>").text(song.name).attr("tabindex", "0")
+                        .on("click", () => select(index))
+                        .on("keydown", event => {
+                            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(index); }
+                        });
+                    rows.push(row);
+                    list.append(row);
+                });
+            }
+            updateRows();
             audio.on("play", render).on("pause", render)
                 .on("timeupdate", progress).on("loadedmetadata", progress)
                 .on("error", () => { if (!closed) heading.text("Unable to play this song. Choose another song or retry."); })
@@ -114,32 +141,70 @@ function createModal(playlist) {
             }
             popup.find("#mute").on("click", () => { media.muted = !media.muted; muteIcon(); });
             volume.on("input", () => { media.volume = Number(volume.val()); muteIcon(); });
-            function save(updatedSongs) {
+            function save(updatedSongs, keepPlayer = false) {
                 return playlistApi.update(playlist.id, { songs: updatedSongs }).done(() => {
                     playlist.songs = updatedSongs;
                     AppStore.getInstance().setSongs({ id: playlist.id, songs: updatedSongs });
-                    createModal(playlist);
+                    if (keepPlayer && !closed) {
+                        const previousUrl = urls[current];
+                        songs = updatedSongs;
+                        popup.find("#player-message").text("").prop("hidden", true);
+                        updateUrls();
+                        updateRows();
+                        current = previousUrl ? urls.indexOf(previousUrl) : -1;
+                        if (current >= 0) {
+                            heading.text(`Now playing: ${songs[current].name}`);
+                            $("title").text(`Playing: ${songs[current].name}`);
+                            render();
+                        } else {
+                            const first = urls.findIndex(Boolean);
+                            if (first >= 0) select(first);
+                            else {
+                                media.pause();
+                                audio.removeAttr("src");
+                                media.load();
+                                remove.prop("disabled", true);
+                                popup.find("#play-pause").prop("disabled", true);
+                                heading.text("This playlist has no playable songs.");
+                                $("title").text(originalTitle);
+                                render(); progress();
+                            }
+                        }
+                    } else if (!keepPlayer) createModal(playlist);
                 }).fail(() => {
+                    if (keepPlayer) {
+                        if (!closed) heading.text("Songs could not be saved. Your playlist has not changed.");
+                        return;
+                    }
                     Swal.fire({ icon: "error", title: "Songs could not be saved", text: "Your playlist has not changed." })
                         .then(() => createModal(playlist));
                 });
             }
             remove.prop("disabled", true).on("click", () => {
                 if (current < 0) return;
+                if (songs.length <= 1) {
+                    popup.find("#player-message")
+                        .text("At least one song must remain in the playlist.")
+                        .prop("hidden", false);
+                    return;
+                }
                 const selected = current;
-                cleanup();
-                Swal.fire({ title: "Delete selected song?", text: songs[selected].name, icon: "warning", showCancelButton: true })
+                createEditorDialog().fire({
+                    title: "Delete current song?",
+                    text: `Do you really want to remove song ${songs[selected].name}?`,
+                    confirmButtonText: "Delete",
+                    cancelButtonText: "Cancel",
+                })
                     .then(result => {
-                        if (result.isConfirmed) save(songs.filter((song, index) => index !== selected));
-                        else createModal(playlist);
+                        if (result.isConfirmed && !closed) {
+                            save(songs.filter((song, index) => index !== selected), true);
+                        }
                     });
             });
             popup.find("#update-songs").on("click", () => {
-                cleanup();
-                const editor = addSongs(songs);
+                const editor = addSongs(songs, { overlay: true });
                 editor.cb.then(result => {
-                    if (result.isConfirmed) save(editor.songsData.songs);
-                    else createModal(playlist);
+                    if (result.isConfirmed) save(editor.songsData.songs, true);
                 });
             });
             const first = urls.findIndex(Boolean);

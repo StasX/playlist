@@ -1,5 +1,26 @@
 @use "../base/variables";
 
+.songs-editor-dialog {
+    z-index: 1100;
+    width: min(600px, calc(100% - 32px));
+    max-height: calc(100% - 32px);
+    overflow: auto;
+    border: 0;
+    border-radius: 8px;
+    padding: 24px;
+
+    &::backdrop { background: rgba(0, 0, 0, 0.4); }
+
+    h2 { margin-bottom: 24px; text-align: center; }
+
+    .songs-editor-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 24px;
+    }
+}
+
 .image-container {
     border-radius: 8px;
     display: none;
