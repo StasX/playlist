@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\PlaylistModel;
@@ -10,51 +11,53 @@ class PlaylistController
 {
     public function getAllPlaylists(Request $request, Response $response): Response
     {
-        $playlists = PlaylistModel::select('id', 'name', 'image')->get()->toArray();
-        $response->getBody()->write(json_encode($playlists));
+        $playlists = PlaylistModel::query()->get(['id', 'name', 'image'])->toArray();
+        $response->getBody()->write(json_encode($playlists, JSON_THROW_ON_ERROR));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    /** @param array{id: string} $args */
     public function getPlaylist(Request $request, Response $response, array $args): Response
     {
-        $playlist = PlaylistModel::select('id', 'name', 'image')->find($args['id']);
-        if (! $playlist) {
+        $playlist = PlaylistModel::query()->find($args['id'], ['id', 'name', 'image']);
+        if ($playlist === null) {
             return $response->withStatus(404);
         }
-        $response->getBody()->write(json_encode($playlist));
+        $response->getBody()->write(json_encode($playlist, JSON_THROW_ON_ERROR));
         return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function createPlaylist(Request $request, Response $response): Response
     {
         $payload = json_decode((string) $request->getBody());
-        if (! $payload instanceof \stdClass || ! PlaylistValidator::validPlaylist(get_object_vars($payload))) {
+        $data = $payload instanceof \stdClass ? get_object_vars($payload) : null;
+        if ($data === null || ! PlaylistValidator::validPlaylist($data)) {
             return $response->withStatus(400);
         }
-        $data = get_object_vars($payload);
 
-        $playlist        = new PlaylistModel();
-        $playlist->name  = $data['name'];
+        $playlist = new PlaylistModel();
+        $playlist->name = $data['name'];
         $playlist->image = $data['image'];
-        $playlist->songs = json_encode($data['songs']);
+        $playlist->songs = json_encode($data['songs'], JSON_THROW_ON_ERROR);
         $playlist->save();
         $response->getBody()->write(json_encode([
             'id' => $playlist->id,
             'name' => $playlist->name,
             'image' => $playlist->image,
-        ]));
+        ], JSON_THROW_ON_ERROR));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
     }
 
+    /** @param array{id: string} $args */
     public function updatePlaylist(Request $request, Response $response, array $args): Response
     {
         $payload = json_decode((string) $request->getBody());
-        if (! $payload instanceof \stdClass || ! PlaylistValidator::validPlaylist(get_object_vars($payload), true)) {
+        $data = $payload instanceof \stdClass ? get_object_vars($payload) : null;
+        if ($data === null || ! PlaylistValidator::validPlaylist($data, true)) {
             return $response->withStatus(400);
         }
-        $data = get_object_vars($payload);
-        $playlist = PlaylistModel::find($args['id']);
-        if (! $playlist) {
+        $playlist = PlaylistModel::query()->find($args['id']);
+        if ($playlist === null) {
             return $response->withStatus(404);
         }
         if (isset($data['name'])) {
@@ -64,17 +67,18 @@ class PlaylistController
             $playlist->image = $data['image'];
         }
         if (isset($data['songs'])) {
-            $playlist->songs = json_encode($data['songs']);
+            $playlist->songs = json_encode($data['songs'], JSON_THROW_ON_ERROR);
         }
         $playlist->save();
         return $response->withStatus(200);
     }
 
+    /** @param array{id: string} $args */
     public function deletePlaylist(Request $request, Response $response, array $args): Response
     {
-        $id       = $args['id'];
-        $playlist = PlaylistModel::find($id);
-        if ($playlist) {
+        $id = $args['id'];
+        $playlist = PlaylistModel::query()->find($id);
+        if ($playlist !== null) {
             $playlist->delete();
             return $response->withStatus(204);
         }

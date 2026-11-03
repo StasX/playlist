@@ -1,149 +1,151 @@
 const $ = require("jquery");
 const Swal = require("sweetalert2");
 const html = require("../../../views/player/player.html");
+const { playlistApi } = require("../../api/playlistApi");
+const { AppStore } = require("../../store/AppStore");
+const { addSongs } = require("../songs/add");
 
 function createModal(playlist) {
-    let songName;
-    Swal.fire({
-        html: html,
-        showConfirmButton: false,
-        showCancelButton: false,
-        showCloseButton: false,
-        allowEscapeKey: false,
-        allowOutsideClick: false,
-        allowEnterKey: true,
-        width: 740,
-        customClass: {
-            popup: "player-popup",
-            htmlContainer: "player-html-container"
-        },
+    const audio = $("<audio/>");
+    const media = audio.get(0);
+    const originalTitle = $("title").text();
+    let closed = false;
+    function cleanup() {
+        if (closed) return;
+        closed = true;
+        media.pause();
+        audio.removeAttr("src");
+        media.load();
+        $("title").text(originalTitle);
+    }
+    return Swal.fire({
+        html, showConfirmButton: false, showCloseButton: true, width: 740,
+        customClass: { popup: "player-popup", htmlContainer: "player-html-container" },
+        willClose: cleanup,
+        didDestroy: cleanup,
         didOpen: () => {
-            function calcTime(totalSeconds) {
-                const minutes = Math.floor(totalSeconds / 60);
-                const seconds = Math.floor(totalSeconds % 60);
-                const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-                const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-                return `${formattedMinutes}:${formattedSeconds}`;
-            }
-            let interval;
-            let muted = false;
-            let songDuration = "00:00 / 00:00";
             const popup = $(Swal.getPopup());
-            //popup.css({ "width": "800px", "border-radius": "300px" });
-            const image = popup.find("img");
-            image.attr("src", playlist.image);
-            const nowPlaying = popup.find("h5");
-            const songsList = popup.find("ol");
-            const playPauseBtn = popup.find("#play-pause");
-            const audioPlayPause = popup.find("#audio-play-pause");
-            const duration = popup.find("#duration");
+            const image = popup.find("img").attr("src", playlist.image);
+            const heading = popup.find("h5");
+            const list = popup.find("ol");
             const tracker = popup.find("#tracker");
-            const muteButton = popup.find("#mute");
-            const vol = popup.find("#vol");
-            const removeSongBtn = popup.find("#remove-song");
-            const updateSongsBtn = popup.find("#update-songs");
-
-            songName = playlist.songs[0]?.name || "";
-            const audio = $('<audio/>');
-
-            $.each(playlist.songs, (i, song) => {
-                songsList.append($("<li>").text(song.name));
+            const volume = popup.find("#vol").val(media.volume);
+            const remove = popup.find("#remove-song").attr("title", "Delete selected song");
+            popup.find("#update-songs").attr("title", "Edit playlist songs");
+            const songs = Array.isArray(playlist.songs) ? playlist.songs : [];
+            let current = -1;
+            const rows = [];
+            const urls = [];
+            $.each(songs, (index, song) => {
                 try {
                     const url = new URL(song.url);
-                    if (url.protocol === "http:" || url.protocol === "https:") {
-                        audio.append($("<source>").attr("src", url.href).attr("type", "audio/mpeg"));
-                    }
-                } catch {
-                    // Ignore invalid URLs in previously stored playlists.
-                }
+                    urls[index] = ["http:", "https:"].includes(url.protocol) ? url.href : null;
+                } catch { urls[index] = null; }
             });
-
-            let currentSong = 0;
-            const song = audio.get(currentSong);
-            let currentSongName = playlist.songs[currentSong].name
-            nowPlaying.text(`Now playing: ${currentSongName}`);
-            $("title").text(`Playing: ${currentSongName}`);
-            audio.ready(() => {
-                song.play();
-            });
-
-            audio.on("play", () => {
-                const pauseClass = "fa-solid fa-pause";
-                audioPlayPause.attr('class', pauseClass);
-                playPauseBtn.html(`<i class="${pauseClass}"></i>`);
-                image.addClass("rotation");
-                const songContainer = songsList.find(`li:nth-child(${currentSong + 1})`);
-                songContainer.text(currentSongName).prepend(
-                    $("<i>").addClass("fa-solid fa-play list-playing").css("top", currentSong * 24)
-                );
-                const time = calcTime(audio[0].currentTime);
-                tracker.val(audio[0].currentTime);
-                duration.text(`${time} / ${songDuration}`);
-                interval = setInterval(() => {
-                    const time = calcTime(audio[0].currentTime);
-                    tracker.val(audio[0].currentTime);
-                    duration.text(`${time} / ${songDuration}`);
-                }, 1000);
-            });
-            audio.on("pause", () => {
-                const playClass = "fa-solid fa-play";
-                audioPlayPause.attr('class', playClass);
-                playPauseBtn.html(`<i class="${playClass}"></i>`);
-                const songContainer = songsList.find(`li:nth-child(${currentSong + 1})`);
-                songContainer.text(currentSongName).prepend(
-                    $("<i>").addClass("fa-solid fa-pause list-playing").css("top", currentSong * 24)
-                );
-                image.removeClass("rotation");
-                clearInterval(interval);
-            });
-
-            audio.on('loadedmetadata', () => {
-                songDuration = calcTime(audio[0].duration);
-                tracker.attr("max", Math.floor(audio[0].duration));
-                duration.text(`00:00 / ${songDuration}`);
-                vol.val(audio[0].volume);
-            });
-
-            playPauseBtn.click(() => {
-                song.paused ? song.play() : song.pause();
-            });
-
-            audioPlayPause.click(() => {
-                song.paused ? song.play() : song.pause();
-            });
-            tracker.on("change", () => {
-                audio[0].currentTime = tracker.val();
-            });
-            muteButton.click(() => {
-                muted = !muted;
-                if (muted) {
-                    audio.attr("muted", "muted");
-                    muteButton.removeClass("fa-volume-high");
-                    muteButton.addClass("fa-volume-xmark");
+            function time(value) {
+                if (!Number.isFinite(value)) return "00:00";
+                return `${Math.floor(value / 60).toString().padStart(2, "0")}:${Math.floor(value % 60).toString().padStart(2, "0")}`;
+            }
+            function progress() {
+                tracker.attr("max", Number.isFinite(media.duration) ? media.duration : 0).val(media.currentTime);
+                popup.find("#duration").text(`${time(media.currentTime)} / ${time(media.duration)}`);
+            }
+            function render() {
+                const playing = current >= 0 && !media.paused && !media.ended;
+                const icon = playing ? "fa-solid fa-pause" : "fa-solid fa-play";
+                popup.find("#audio-play-pause").attr("class", icon);
+                popup.find("#play-pause").html(`<i class="${icon}"></i>`);
+                image.toggleClass("rotation", playing);
+                $.each(rows, (index, row) => {
+                    row.text(songs[index].name).attr("aria-current", index === current ? "true" : "false");
+                    if (index === current) row.prepend($("<i>").addClass(`${icon} list-playing`));
+                });
+            }
+            function play() {
+                if (closed || !urls[current]) return;
+                const pending = media.play();
+                if (pending) pending.catch(() => {
+                    if (!closed) { heading.text("Playback could not start. Press play to retry."); render(); }
+                });
+            }
+            function select(index) {
+                if (closed || index < 0 || index >= songs.length) return;
+                media.pause();
+                current = index;
+                remove.prop("disabled", false);
+                popup.find("#play-pause").prop("disabled", !urls[index]);
+                if (!urls[index]) {
+                    audio.removeAttr("src");
+                    media.load();
+                    heading.text(`Cannot play: ${songs[index].name}. You can delete this song or edit its URL.`);
+                    $("title").text(originalTitle);
+                    render(); progress();
                     return;
                 }
-                audio.removeAttr("muted");
-                muteButton.removeClass("fa-volume-xmark");
-                muteButton.addClass("fa-volume-high");
+                audio.attr("src", urls[index]);
+                media.load();
+                heading.text(`Now playing: ${songs[index].name}`);
+                $("title").text(`Playing: ${songs[index].name}`);
+                render(); progress(); play();
+            }
+            $.each(songs, (index, song) => {
+                const row = $("<li>").text(song.name).attr("tabindex", "0")
+                    .on("click", () => select(index))
+                    .on("keydown", event => {
+                        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); select(index); }
+                    });
+                rows.push(row);
+                list.append(row);
             });
-            vol.on("change", () => {
-
-                const volume = vol.val();
-                audio[0].volume = volume;
-                if (volume == 0) {
-                    muteButton.removeClass("fa-volume-high");
-                    muteButton.addClass("fa-volume-xmark");
-                    return;
-                }
-                muteButton.removeClass("fa-volume-xmark");
-                muteButton.addClass("fa-volume-high");
+            audio.on("play", render).on("pause", render)
+                .on("timeupdate", progress).on("loadedmetadata", progress)
+                .on("error", () => { if (!closed) heading.text("Unable to play this song. Choose another song or retry."); })
+                .on("ended", () => {
+                    const next = urls.findIndex((url, index) => index > current && url);
+                    if (next >= 0) select(next);
+                    else render();
+                });
+            const toggle = () => { if (current >= 0) media.paused ? play() : media.pause(); };
+            popup.find("#play-pause").on("click", toggle);
+            popup.find("#audio-play-pause").on("click", toggle);
+            tracker.on("input", () => { if (Number.isFinite(media.duration)) media.currentTime = Number(tracker.val()); });
+            function muteIcon() {
+                popup.find("#mute").attr("class", media.muted || media.volume === 0 ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high");
+            }
+            popup.find("#mute").on("click", () => { media.muted = !media.muted; muteIcon(); });
+            volume.on("input", () => { media.volume = Number(volume.val()); muteIcon(); });
+            function save(updatedSongs) {
+                return playlistApi.update(playlist.id, { songs: updatedSongs }).done(() => {
+                    playlist.songs = updatedSongs;
+                    AppStore.getInstance().setSongs({ id: playlist.id, songs: updatedSongs });
+                    createModal(playlist);
+                }).fail(() => {
+                    Swal.fire({ icon: "error", title: "Songs could not be saved", text: "Your playlist has not changed." })
+                        .then(() => createModal(playlist));
+                });
+            }
+            remove.prop("disabled", true).on("click", () => {
+                if (current < 0) return;
+                const selected = current;
+                cleanup();
+                Swal.fire({ title: "Delete selected song?", text: songs[selected].name, icon: "warning", showCancelButton: true })
+                    .then(result => {
+                        if (result.isConfirmed) save(songs.filter((song, index) => index !== selected));
+                        else createModal(playlist);
+                    });
             });
-            removeSongBtn.click(()=>{
-                
+            popup.find("#update-songs").on("click", () => {
+                cleanup();
+                const editor = addSongs(songs);
+                editor.cb.then(result => {
+                    if (result.isConfirmed) save(editor.songsData.songs);
+                    else createModal(playlist);
+                });
             });
-            updateSongsBtn.click(()=>{
-
-            });
+            const first = urls.findIndex(Boolean);
+            popup.find("#play-pause").prop("disabled", first < 0);
+            if (first >= 0) select(first);
+            else { heading.text(songs.length ? "No playable songs. Edit the playlist to add a valid URL." : "This playlist is empty. Add songs to start listening."); render(); progress(); }
         },
     });
 }

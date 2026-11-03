@@ -1,0 +1,3 @@
+# The bootstrap uses --repo directly and does not need local Helm repositories.
+apiVersion: v1
+repositories: []

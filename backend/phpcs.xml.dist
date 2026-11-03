@@ -31,7 +31,7 @@
     <arg name="parallel" value="8"/>
 
     <!-- PHP version -->
-    <config name="php_version" value="80300"/>
+    <config name="php_version" value="80500"/>
 
     <!-- Encoding -->
     <config name="encoding" value="utf-8"/>

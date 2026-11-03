@@ -10,8 +10,10 @@ AppFactory::setContainer(new Container());
 $app = AppFactory::create();
 $app->addRoutingMiddleware();
 
-require __DIR__ . '/logger.php';
-$app->addErrorMiddleware(true, true, true, $logger);
+/** @var \Monolog\Logger $logger */
+$logger = require __DIR__ . '/logger.php';
+$displayErrorDetails = getenv('APP_ENV') === 'development';
+$app->addErrorMiddleware($displayErrorDetails, true, true, $logger);
 
 require __DIR__ . '/../config/routes.php';
 

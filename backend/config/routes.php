@@ -1,10 +1,11 @@
 <?php
+
 use App\Controllers\PlaylistController;
 use App\Controllers\SongsController;
+use Psr\Container\ContainerInterface;
+use Slim\App;
 
-
-/** @var App $app */
-
+/** @var App<ContainerInterface|null> $app */
 
 $app->get('/api/playlist', [PlaylistController::class, 'getAllPlaylists']);
 $app->get('/api/playlist/{id}', [PlaylistController::class, 'getPlaylist']);
