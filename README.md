@@ -35,6 +35,8 @@ See [infra/jenkins/README.md](infra/jenkins/README.md) for the Helm bootstrap, p
 .\infra\jenkins\bootstrap.ps1
 ```
 
+![Successful Jenkins pipeline](docs/screenshots/Jenkins-success.png)
+
 ## Local development
 
 Use PHP 8.5 and Composer 2, matching the backend image and Jenkins build container.
