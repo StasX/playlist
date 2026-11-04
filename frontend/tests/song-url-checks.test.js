@@ -12,7 +12,7 @@ test('song URL checks require audio metadata, cache results, and stop on close',
         removeAttribute(key) { delete this[key]; }
         load() {}
     } };
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../resources/js/features/songs/urlChecks.js'), 'utf8'), context);
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/js/utils/validators/songUrlChecks.js'), 'utf8'), context);
     const checks = context.exports.createUrlChecks(() => changes++);
     const oldUrl = 'https://example.com/old.mp3';
     const newUrl = 'https://example.com/new.mp3';

@@ -2,7 +2,7 @@ const path = require("path");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const StaticSitePlugin = require("./static-site-plugin");
+const StaticSitePlugin = require("./webpack/static-site-plugin");
 
 module.exports = async () => {
     const { WebpackManifestPlugin } = await import("webpack-manifest-plugin");
@@ -16,7 +16,7 @@ module.exports = async () => {
 
         devtool: "source-map",
 
-        entry: "./resources/js/main.js",
+        entry: "./src/js/main.js",
 
         output: {
             path: path.resolve(__dirname, "dist"),

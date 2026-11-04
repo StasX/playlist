@@ -3,8 +3,8 @@ const Swal = require("sweetalert2");
 const html = require("../../../views/player/player.html");
 const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
-const { addSongs } = require("../songs/add");
-const { createEditorDialog } = require("../songs/editorDialog");
+const { addSongs } = require("../songs/addSongs");
+const { createEditorDialog } = require("../../utils/dialogs/songEditorDialog");
 
 function createModal(playlist) {
     const audio = $("<audio/>");

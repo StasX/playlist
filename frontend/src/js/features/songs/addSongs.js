@@ -3,8 +3,8 @@ const Swal = require('sweetalert2');
 const html = require("../../../views/modals/songs.html");
 const row = require("../../../views/modals/songsRow.html");
 const { validateSongsForm } = require("../../utils/validators/songsForm");
-const { createUrlChecks } = require("./urlChecks");
-const { createEditorDialog } = require("./editorDialog");
+const { createUrlChecks } = require("../../utils/validators/songUrlChecks");
+const { createEditorDialog } = require("../../utils/dialogs/songEditorDialog");
 
 function updateForm(popup, songsData, confirmBtn, checks) {
     const isValid = validateSongsForm(popup, songsData, confirmBtn, url => checks.isVerified(url));

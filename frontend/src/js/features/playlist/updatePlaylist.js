@@ -4,7 +4,7 @@ const { fail } = require("../../utils/messages/fail");
 const { playlistApi } = require("../../api/playlistApi");
 const { AppStore } = require("../../store/AppStore");
 const html = require("../../../views/modals/playlist.html");
-const { setupImagePreview } = require("./imagePreview");
+const { setupImagePreview } = require("./playlistImagePreview");
 
 
 

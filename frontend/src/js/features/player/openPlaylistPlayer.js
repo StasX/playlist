@@ -3,7 +3,7 @@ const { AppStore } = require("../../store/AppStore");
 
 const { fail } = require("../../utils/messages/fail");
 const { songsApi } = require("../../api/songsApi");
-const { createModal } = require("./modal");
+const { createModal } = require("./playlistPlayerModal");
 
 function createPlayer(element) {
     const index = element.closest(".card-container").index();

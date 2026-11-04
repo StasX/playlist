@@ -58,15 +58,15 @@ function harness(songs, confirmDelete = false) {
                 requests.push(request); return request;
             } } };
             if (id.endsWith('AppStore')) return { AppStore: { getInstance: () => ({ setSongs: data => storeUpdates.push(data) }) } };
-            if (id.endsWith('songs/add')) return { addSongs(initial, options) { editor = { initial, options, songsData: { songs: [] } }; return { ...editor, cb: { then(cb) { editor.finish = cb; } } }; } };
-            if (id.endsWith('songs/editorDialog')) return { createEditorDialog: () => ({ fire(options) {
+            if (id.endsWith('songs/addSongs')) return { addSongs(initial, options) { editor = { initial, options, songsData: { songs: [] } }; return { ...editor, cb: { then(cb) { editor.finish = cb; } } }; } };
+            if (id.endsWith('utils/dialogs/songEditorDialog')) return { createEditorDialog: () => ({ fire(options) {
                 overlays.push(options);
                 return Promise.resolve({ isConfirmed: confirmDelete });
             } }) };
             throw new Error(`Unexpected import: ${id}`);
         },
     };
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../resources/js/features/player/modal.js'), 'utf8'), context);
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/js/features/player/playlistPlayerModal.js'), 'utf8'), context);
     context.exports.createModal(playlist);
     return { selections, nodes, dialogs, overlays, requests, storeUpdates, playlist, get editor() { return editor; }, audio: nodes.find(n => n.selector === '<audio/>') };
 }

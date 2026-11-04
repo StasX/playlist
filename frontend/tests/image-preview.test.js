@@ -22,9 +22,9 @@ function harness(initialName = 'Playlist', initialUrl = 'https://example.com/cov
             requests.push(request);
             return request;
         } };
-        return require(path.join(__dirname, '../resources/js/features/playlist', id));
+        return require(path.join(__dirname, '../src/js/features/playlist', id));
     } };
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../resources/js/features/playlist/imagePreview.js'), 'utf8'), context);
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/js/features/playlist/playlistImagePreview.js'), 'utf8'), context);
     context.exports.setupImagePreview({ find: () => container }, url, name, {}, button);
     return { requests, name, url, button, image, container };
 }

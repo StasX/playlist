@@ -1,13 +1,13 @@
 const $ = require("jquery");
 const Swal = require('sweetalert2');
 const html = require("../../../views/modals/playlist.html");
-const { addSongs } = require("../songs/add");
+const { addSongs } = require("../songs/addSongs");
 const { playlistApi } = require("../../api/playlistApi");
 const { displayPlaylists } = require("../../ui/display");
 const { success} = require("../../utils/messages/success");
 const {fail} = require("../../utils/messages/fail");
 const {AppStore} = require("../../store/AppStore");
-const { setupImagePreview } = require("./imagePreview");
+const { setupImagePreview } = require("./playlistImagePreview");
 
 function addPlaylist(playlists) {
     const playlist = {};

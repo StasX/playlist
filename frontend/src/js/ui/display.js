@@ -1,8 +1,8 @@
 const $ = require("jquery");
-const { removePlaylist } = require("../features/playlist/remove");
-const { updatePlaylist } = require("../features/playlist/update");
+const { removePlaylist } = require("../features/playlist/removePlaylist");
+const { updatePlaylist } = require("../features/playlist/updatePlaylist");
 const { AppStore } = require("../store/AppStore");
-const {createPlayer} =require("../features/player");
+const {createPlayer} =require("../features/player/openPlaylistPlayer");
 
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g,

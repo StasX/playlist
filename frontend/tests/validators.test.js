@@ -3,8 +3,8 @@ const { test } = require('node:test');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { validHttpUrl } = require('../resources/js/utils/validators/url');
-const { validatePlaylistForm } = require('../resources/js/utils/validators/playlistForm');
+const { validHttpUrl } = require('../src/js/utils/validators/url');
+const { validatePlaylistForm } = require('../src/js/utils/validators/playlistForm');
 
 const context = {
     exports: {},
@@ -14,7 +14,7 @@ const context = {
         throw new Error(`Unexpected import: ${id}`);
     },
 };
-vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../resources/js/utils/validators/songsForm.js'), 'utf8'), context);
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../src/js/utils/validators/songsForm.js'), 'utf8'), context);
 const { validateSongsForm } = context.exports;
 const field = value => ({ val: () => value, data() {}, toggleClass(key, enabled) { this[key] = enabled; } });
 const button = () => ({ prop(key, value) { this[key] = value; } });

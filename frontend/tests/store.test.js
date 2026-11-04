@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { AppStore } = require('../resources/js/store/AppStore');
+const { AppStore } = require('../src/js/store/AppStore');
 
 const playlist = (id, name = 'Rock') => ({
     id, name, image: 'https://example.com/cover.jpg', songs: [],

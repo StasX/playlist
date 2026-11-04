@@ -2,12 +2,12 @@ const path = require("path");
 const webpack = require("webpack");
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const StaticSitePlugin = require("./static-site-plugin");
+const StaticSitePlugin = require("./webpack/static-site-plugin");
 
 module.exports = {
     mode: "development",
 
-    entry: "./resources/js/main.js",
+    entry: "./src/js/main.js",
 
     output: {
         path: path.resolve(__dirname, "dist"),
