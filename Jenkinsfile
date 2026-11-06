@@ -20,7 +20,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         name: 'checkov', image: 'sm1986/checkov', command: 'sleep', args: '1d',
         runAsUser: '1000', runAsGroup: '1000'
     ),
-    containerTemplate(name: 'semgrep', image: 'python:3.13', command: 'sleep', args: '1d')
+    containerTemplate(name: 'semgrep', image: 'sm1986/semgrep', command: 'sleep', args: '1d')
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
     node(POD_LABEL) {
         stage('Checkout') {
@@ -28,11 +28,6 @@ podTemplate(cloud: 'kubernetes', containers: [
         }
         stage('Environment preparations') {
             parallel(
-                'Install Semgrep': {
-                    container('semgrep') {
-                        sh 'python3 -m venv /tmp/semgrep-venv && /tmp/semgrep-venv/bin/pip install semgrep'
-                    }
-                },
                 'Install PHP dependencies': {
                     container('composer') {
                         sh 'sh infra/php/prepare-php.sh'
