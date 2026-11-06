@@ -20,7 +20,10 @@ podTemplate(cloud: 'kubernetes', containers: [
         name: 'checkov', image: 'sm1986/checkov', command: 'sleep', args: '1d',
         runAsUser: '1000', runAsGroup: '1000'
     ),
-    containerTemplate(name: 'semgrep', image: 'sm1986/semgrep', command: 'sleep', args: '1d')
+    containerTemplate(
+        name: 'semgrep', image: 'sm1986/semgrep', command: 'sleep', args: '1d',
+        runAsUser: '1000', runAsGroup: '1000'
+    )
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
     node(POD_LABEL) {
         stage('Checkout') {
