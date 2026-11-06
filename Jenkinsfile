@@ -96,7 +96,8 @@ podTemplate(cloud: 'kubernetes', containers: [
                     container('semgrep') {
                         dir('backend') {
                             try {
-                                sh 'semgrep scan --config=p/php --error --metrics=off > semgrep-php.txt 2>&1'
+                                // The pod UID differs from the image user; give each scan a writable home.
+                                sh 'HOME="$(mktemp -d)" semgrep scan --config=p/php --error --metrics=off > semgrep-php.txt 2>&1'
                             } finally {
                                 sh 'cat semgrep-php.txt'
                                 archiveArtifacts(artifacts: 'semgrep-php.txt', allowEmptyArchive: true)
@@ -120,7 +121,7 @@ podTemplate(cloud: 'kubernetes', containers: [
                 'Semgrep Docker': {
                     container('semgrep') {
                         try {
-                            sh 'semgrep scan --config=p/dockerfile --error --metrics=off > semgrep-docker.txt 2>&1'
+                            sh 'HOME="$(mktemp -d)" semgrep scan --config=p/dockerfile --error --metrics=off > semgrep-docker.txt 2>&1'
                         } finally {
                             sh 'cat semgrep-docker.txt'
                             archiveArtifacts(artifacts: 'semgrep-docker.txt', allowEmptyArchive: true)
