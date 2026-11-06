@@ -15,7 +15,11 @@ podTemplate(cloud: 'kubernetes', containers: [
     ),
     containerTemplate(name: 'composer', image: 'php:8.5-cli-alpine', command: 'sleep', args: '1d'),
     containerTemplate(name: 'node', image: 'node:26.5.0-alpine', command: 'sleep', args: '1d'),
-    containerTemplate(name: 'checkov', image: 'sm1986/checkov', command: 'sleep', args: '1d'),
+    // Match the Jenkins agent so shell steps can write shared workspace launch files.
+    containerTemplate(
+        name: 'checkov', image: 'sm1986/checkov', command: 'sleep', args: '1d',
+        runAsUser: '1000', runAsGroup: '1000'
+    ),
     containerTemplate(name: 'semgrep', image: 'python:3.13', command: 'sleep', args: '1d')
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
     node(POD_LABEL) {
