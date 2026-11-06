@@ -13,7 +13,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         args: '--storage-driver=vfs',
         envVars: [envVar(key: 'DOCKER_TLS_CERTDIR', value: '')]
     ),
-    containerTemplate(name: 'composer', image: 'sm-1986/composer', command: 'sleep', args: '1d'),
+    containerTemplate(name: 'composer', image: 'sm1986/composer', command: 'sleep', args: '1d'),
     containerTemplate(name: 'node', image: 'node:26.5.0-alpine', command: 'sleep', args: '1d'),
     // Match the Jenkins agent so shell steps can write shared workspace launch files.
     containerTemplate(
