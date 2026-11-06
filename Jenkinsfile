@@ -1,4 +1,4 @@
-@Library(['installers', 'dockerizer', 'code-qualities', 'securityscans']) _
+@Library(['dockerizer', 'code-qualities', 'securityscans']) _
 
 def image = 'sm1986/playlist'
 def version = '1.0.0'
@@ -13,7 +13,7 @@ podTemplate(cloud: 'kubernetes', containers: [
         args: '--storage-driver=vfs',
         envVars: [envVar(key: 'DOCKER_TLS_CERTDIR', value: '')]
     ),
-    containerTemplate(name: 'composer', image: 'php:8.5-cli-alpine', command: 'sleep', args: '1d'),
+    containerTemplate(name: 'composer', image: 'sm-1986/composer', command: 'sleep', args: '1d'),
     containerTemplate(name: 'node', image: 'node:26.5.0-alpine', command: 'sleep', args: '1d'),
     // Match the Jenkins agent so shell steps can write shared workspace launch files.
     containerTemplate(
@@ -33,10 +33,11 @@ podTemplate(cloud: 'kubernetes', containers: [
             parallel(
                 'Install PHP dependencies': {
                     container('composer') {
-                        sh 'sh infra/php/prepare-php.sh'
                         // Checkout and Composer run as different users in the shared pod.
                         sh 'git config --global --add safe.directory "$WORKSPACE"'
-                        dir('backend') { installersForPHPBasedTools.installAll(true, true) }
+                        dir('backend') {
+                            sh 'composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader'
+                        }
                     }
                 },
                 'Wait for Docker': {
