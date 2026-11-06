@@ -24,12 +24,6 @@ podTemplate(cloud: 'kubernetes', containers: [
         }
         stage('Environment preparations') {
             parallel(
-                // 'Install Checkov': {
-                //     container('checkov') {
-                //         // Containers share the workspace; isolate their Python environments.
-                //         sh 'python3 -m venv /tmp/checkov-venv && /tmp/checkov-venv/bin/pip install checkov'
-                //     }
-                // },
                 'Install Semgrep': {
                     container('semgrep') {
                         sh 'python3 -m venv /tmp/semgrep-venv && /tmp/semgrep-venv/bin/pip install semgrep'
@@ -38,6 +32,8 @@ podTemplate(cloud: 'kubernetes', containers: [
                 'Install PHP dependencies': {
                     container('composer') {
                         sh 'sh infra/php/prepare-php.sh'
+                        // Checkout and Composer run as different users in the shared pod.
+                        sh 'git config --global --add safe.directory "$WORKSPACE"'
                         dir('backend') { installersForPHPBasedTools.installAll(true, true) }
                     }
                 },
