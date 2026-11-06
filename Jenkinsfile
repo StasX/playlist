@@ -15,7 +15,7 @@ podTemplate(cloud: 'kubernetes', containers: [
     ),
     containerTemplate(name: 'composer', image: 'php:8.5-cli-alpine', command: 'sleep', args: '1d'),
     containerTemplate(name: 'node', image: 'node:26.5.0-alpine', command: 'sleep', args: '1d'),
-    containerTemplate(name: 'checkov', image: 'python:3.13', command: 'sleep', args: '1d'),
+    containerTemplate(name: 'checkov', image: 'sm1986/checkov', command: 'sleep', args: '1d'),
     containerTemplate(name: 'semgrep', image: 'python:3.13', command: 'sleep', args: '1d')
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
     node(POD_LABEL) {
@@ -24,12 +24,12 @@ podTemplate(cloud: 'kubernetes', containers: [
         }
         stage('Environment preparations') {
             parallel(
-                'Install Checkov': {
-                    container('checkov') {
-                        // Containers share the workspace; isolate their Python environments.
-                        sh 'python3 -m venv /tmp/checkov-venv && /tmp/checkov-venv/bin/pip install checkov'
-                    }
-                },
+                // 'Install Checkov': {
+                //     container('checkov') {
+                //         // Containers share the workspace; isolate their Python environments.
+                //         sh 'python3 -m venv /tmp/checkov-venv && /tmp/checkov-venv/bin/pip install checkov'
+                //     }
+                // },
                 'Install Semgrep': {
                     container('semgrep') {
                         sh 'python3 -m venv /tmp/semgrep-venv && /tmp/semgrep-venv/bin/pip install semgrep'
