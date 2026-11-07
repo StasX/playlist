@@ -1,9 +1,9 @@
 @Library(['dockerizer', 'code-qualities', 'securityscans']) _
 
 def image = 'sm1986/playlist'
-def version = '1.0.0'
-def envName = 'dev'
-def imageTag = envName ? "${version}-${envName}" : version
+def version = '0.0.0'
+def envName
+def imageTag
 def services = ['frontend', 'backend']
 
 podTemplate(cloud: 'kubernetes', containers: [
@@ -27,7 +27,22 @@ podTemplate(cloud: 'kubernetes', containers: [
 ], volumes: [emptyDirVolume(mountPath: '/var/lib/docker', memory: false)]) {
     node(POD_LABEL) {
         stage('Checkout') {
-            checkout scm
+            def checkoutResult = checkout scm
+            // Multibranch jobs provide BRANCH_NAME; SCM checkout also supports regular jobs.
+            def branchName = env.BRANCH_NAME ?: checkoutResult.GIT_BRANCH
+            if (!branchName) {
+                error('Cannot determine the checked-out branch name.')
+            }
+            branchName = branchName.replaceFirst('^origin/', '')
+            envName = branchName == 'main' ? '' : branchName
+            // Fetch tags explicitly, including when SCM checkout omits them.
+            sh 'git fetch --tags origin'
+            version = sh(
+                returnStdout: true,
+                script: "git for-each-ref --sort=-version:refname --count=1 --format='%(refname:strip=2)' refs/tags"
+            ).trim() ?: '0.0.0'
+            imageTag = envName ? "${version}-${envName}" : version
+            echo "Image version: ${version}; Docker tag: ${imageTag}"
         }
         stage('Environment preparations') {
             parallel(
