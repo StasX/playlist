@@ -68,6 +68,8 @@ The exact Helm-rendered loadable YAML was checked against the running controller
 
 This is not a complete backup: job definitions, build history, plugin binaries, and external credentials are not included. `plugins.yaml` supplies compatible plugin versions for installation; registry and SCM credentials still need to be supplied separately. When exporting again, review the diff, refresh the plugin inventory as needed, and retain the Secret references in the loadable file's security realm.
 
+Registry and SCM credentials are managed through the Jenkins UI and saved in the persistent Jenkins home. The loadable JCasC file deliberately omits the top-level `credentials` section so restarts, configuration reloads, and Helm upgrades preserve those credentials. Remove that section from future exports as well, including empty credential domains. A fresh installation with a new Jenkins home starts without registry or SCM credentials; reinstalling with an existing PVC retains them. The chart-managed admin login is configured separately.
+
 To export again from the UI, open **Manage Jenkins → Configuration as Code** and use **View Configuration** or **Download Configuration**, depending on the installed plugin version. See the [JCasC export documentation](https://jenkins-configuration-as-code.netlify.app/docs/export/) for export limitations.
 
 The loaded configuration creates a Kubernetes cloud named `kubernetes`, matching the root Jenkinsfile. Build agents connect to the controller through its internal Service; localhost is only for browser access.

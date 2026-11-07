@@ -7,14 +7,8 @@ configuration-as-code:
   restricted: reject
   unknown: reject
   version: '1'
-credentials:
-  blueOcean: {}
-  folder: {}
-  providerImpl: {}
-  system:
-    domainCredentials:
-    - domain: {}
-  user: {}
+# Credentials are managed through the UI and persisted in Jenkins home.
+# Omit this section so startup/reloads do not reset the credentials store.
 jenkins:
   authorizationStrategy:
     loggedInUsersCanDoAnything:
